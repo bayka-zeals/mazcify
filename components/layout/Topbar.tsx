@@ -11,9 +11,9 @@ export default function Topbar() {
   const [dropdownOpen, setDropdownOpen] = useState(false)
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 h-16 bg-surface border-b border-border flex items-center justify-between px-6">
+    <header className="fixed left-0 right-0 top-0 z-50 flex h-16 items-center justify-between border-b border-border bg-surface px-6">
       {/* Logo */}
-      <Link href="/dashboard" className="font-display text-xl tracking-widest uppercase text-text">
+      <Link href="/dashboard" className="font-display text-xl uppercase tracking-widest text-text">
         MAZC<span className="text-accent">I</span>FY
       </Link>
 
@@ -21,7 +21,7 @@ export default function Topbar() {
       <div className="relative">
         <button
           onClick={() => setDropdownOpen(!dropdownOpen)}
-          className="flex items-center gap-2.5 hover:bg-surface2 px-3 py-1.5 rounded-lg transition-colors"
+          className="flex items-center gap-2.5 rounded-lg px-3 py-1.5 transition-colors hover:bg-surface2"
         >
           {user?.photoURL ? (
             <Image
@@ -32,11 +32,11 @@ export default function Topbar() {
               className="rounded-full"
             />
           ) : (
-            <div className="w-8 h-8 rounded-full bg-accent/20 border border-accent/30 flex items-center justify-center text-accent text-sm font-semibold">
+            <div className="flex h-8 w-8 items-center justify-center rounded-full border border-accent/30 bg-accent/20 text-sm font-semibold text-accent">
               {user?.displayName?.[0]?.toUpperCase() || 'U'}
             </div>
           )}
-          <span className="text-sm text-text font-medium hidden sm:block">
+          <span className="hidden text-sm font-medium text-text sm:block">
             {user?.displayName?.split(' ')[0] || 'Creator'}
           </span>
           <ChevronDown size={14} className="text-muted" />
@@ -46,21 +46,24 @@ export default function Topbar() {
         {dropdownOpen && (
           <>
             <div className="fixed inset-0 z-10" onClick={() => setDropdownOpen(false)} />
-            <div className="absolute right-0 top-full mt-2 w-48 bg-surface border border-border rounded-xl overflow-hidden z-20 shadow-xl">
-              <div className="px-4 py-3 border-b border-border">
-                <p className="text-xs font-medium text-text truncate">{user?.displayName}</p>
-                <p className="text-xs text-muted truncate">{user?.email}</p>
+            <div className="absolute right-0 top-full z-20 mt-2 w-48 overflow-hidden rounded-xl border border-border bg-surface shadow-xl">
+              <div className="border-b border-border px-4 py-3">
+                <p className="truncate text-xs font-medium text-text">{user?.displayName}</p>
+                <p className="truncate text-xs text-muted">{user?.email}</p>
               </div>
               <Link
                 href="/dashboard/settings"
                 onClick={() => setDropdownOpen(false)}
-                className="flex items-center gap-3 px-4 py-2.5 text-sm text-muted hover:text-text hover:bg-surface2 transition-colors"
+                className="flex items-center gap-3 px-4 py-2.5 text-sm text-muted transition-colors hover:bg-surface2 hover:text-text"
               >
                 <Settings size={14} /> Settings
               </Link>
               <button
-                onClick={() => { setDropdownOpen(false); signOut() }}
-                className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-muted hover:text-text hover:bg-surface2 transition-colors"
+                onClick={() => {
+                  setDropdownOpen(false)
+                  signOut()
+                }}
+                className="flex w-full items-center gap-3 px-4 py-2.5 text-sm text-muted transition-colors hover:bg-surface2 hover:text-text"
               >
                 <LogOut size={14} /> Sign Out
               </button>

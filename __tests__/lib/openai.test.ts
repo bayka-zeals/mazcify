@@ -113,7 +113,7 @@ describe('generateImagePrompt', () => {
         taglines: [],
         productNames: [],
       },
-      { gender: 'female', mascotName: 'Foxy', description: 'Bold and energetic' },
+      { gender: 'female', mascotName: 'Foxy', description: 'Bold and energetic' }
     )
 
     expect(result).toContain('female')
@@ -135,7 +135,7 @@ describe('generateImagePrompt', () => {
         taglines: [],
         productNames: [],
       },
-      { gender: 'neutral' },
+      { gender: 'neutral' }
     )
 
     expect(typeof result).toBe('string')

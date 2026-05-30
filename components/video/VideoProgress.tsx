@@ -57,12 +57,12 @@ export default function VideoProgress({
   const elapsedStr = `${minutes}:${seconds.toString().padStart(2, '0')}`
 
   return (
-    <div className="bg-surface border border-border rounded-xl p-8 sm:p-10">
-      <div className="flex flex-col items-center gap-6 max-w-md mx-auto">
+    <div className="rounded-xl border border-border bg-surface p-8 sm:p-10">
+      <div className="mx-auto flex max-w-md flex-col items-center gap-6">
         {phase === 'done' ? (
           <CheckCircle2 size={44} className="text-accent" />
         ) : phase === 'error' ? (
-          <div className="w-11 h-11 rounded-full bg-red-500/10 border border-red-500/30 flex items-center justify-center">
+          <div className="flex h-11 w-11 items-center justify-center rounded-full border border-red-500/30 bg-red-500/10">
             <Film size={22} className="text-red-300" />
           </div>
         ) : (
@@ -70,7 +70,7 @@ export default function VideoProgress({
         )}
 
         <div className="text-center">
-          <p className="text-base font-semibold text-text mb-1.5 transition-opacity duration-500">
+          <p className="mb-1.5 text-base font-semibold text-text transition-opacity duration-500">
             {statusText}
           </p>
           {phase !== 'done' && phase !== 'error' && (
@@ -83,7 +83,7 @@ export default function VideoProgress({
         </div>
 
         <div className="w-full">
-          <div className="w-full h-2 bg-surface2 rounded-full overflow-hidden border border-border">
+          <div className="h-2 w-full overflow-hidden rounded-full border border-border bg-surface2">
             <div
               className={[
                 'h-full transition-all duration-700 ease-out',
@@ -93,7 +93,7 @@ export default function VideoProgress({
             />
           </div>
 
-          <div className="flex justify-between mt-3">
+          <div className="mt-3 flex justify-between">
             {Array.from({ length: totalClips }).map((_, i) => {
               const reached = i < safeCurrent || phase === 'done'
               const active = i === safeCurrent - 1 && phase === 'clip'
@@ -101,12 +101,8 @@ export default function VideoProgress({
                 <div
                   key={i}
                   className={[
-                    'h-1.5 flex-1 mx-0.5 rounded-full transition-colors',
-                    reached
-                      ? 'bg-accent'
-                      : active
-                        ? 'bg-accent/60 animate-pulse'
-                        : 'bg-border',
+                    'mx-0.5 h-1.5 flex-1 rounded-full transition-colors',
+                    reached ? 'bg-accent' : active ? 'animate-pulse bg-accent/60' : 'bg-border',
                   ].join(' ')}
                 />
               )
@@ -115,9 +111,9 @@ export default function VideoProgress({
         </div>
 
         {phase !== 'done' && phase !== 'error' && (
-          <p className="text-[11px] text-muted text-center max-w-xs leading-relaxed">
-            Generating cinematic scenes one at a time. This usually takes
-            2–5 minutes total. Keep this tab open.
+          <p className="max-w-xs text-center text-[11px] leading-relaxed text-muted">
+            Generating cinematic scenes one at a time. This usually takes 2–5 minutes total. Keep
+            this tab open.
           </p>
         )}
       </div>

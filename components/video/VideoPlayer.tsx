@@ -64,7 +64,7 @@ export default function VideoPlayer({
 
   return (
     <div className="space-y-5">
-      <div className="bg-surface border border-border rounded-xl overflow-hidden">
+      <div className="overflow-hidden rounded-xl border border-border bg-surface">
         <div className="relative aspect-video bg-black">
           <video
             key={videoUrl}
@@ -72,29 +72,29 @@ export default function VideoPlayer({
             poster={thumbnailUrl ?? undefined}
             controls
             playsInline
-            className="absolute inset-0 w-full h-full object-contain"
+            className="absolute inset-0 h-full w-full object-contain"
           />
         </div>
 
-        <div className="p-5 sm:p-6 border-t border-border flex items-start justify-between gap-4 flex-wrap">
+        <div className="flex flex-wrap items-start justify-between gap-4 border-t border-border p-5 sm:p-6">
           <div>
             <h3 className="text-base font-semibold text-text">{templateName}</h3>
-            <p className="text-xs text-muted mt-1">
+            <p className="mt-1 text-xs text-muted">
               {mascotName} · {duration}s
               {partial && (
-                <span className="ml-2 text-yellow-300 bg-yellow-500/10 border border-yellow-500/30 px-2 py-0.5 rounded text-[10px] uppercase tracking-wider">
+                <span className="ml-2 rounded border border-yellow-500/30 bg-yellow-500/10 px-2 py-0.5 text-[10px] uppercase tracking-wider text-yellow-300">
                   Partial
                 </span>
               )}
               {saved && (
-                <span className="ml-2 text-accent bg-accent/10 border border-accent/30 px-2 py-0.5 rounded text-[10px] uppercase tracking-wider">
+                <span className="ml-2 rounded border border-accent/30 bg-accent/10 px-2 py-0.5 text-[10px] uppercase tracking-wider text-accent">
                   Saved
                 </span>
               )}
             </p>
           </div>
 
-          <div className="flex items-center gap-2 flex-wrap">
+          <div className="flex flex-wrap items-center gap-2">
             <ActionButton
               icon={<ThumbsUp size={14} />}
               label="Like"
@@ -135,7 +135,7 @@ export default function VideoPlayer({
             type="button"
             onClick={onSave}
             disabled={saving}
-            className="inline-flex items-center gap-2 bg-accent text-bg text-sm font-bold tracking-wider uppercase px-8 py-3.5 rounded-md hover:shadow-accent-glow hover:-translate-y-0.5 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0 disabled:hover:shadow-none"
+            className="inline-flex items-center gap-2 rounded-md bg-accent px-8 py-3.5 text-sm font-bold uppercase tracking-wider text-bg transition-all duration-200 hover:-translate-y-0.5 hover:shadow-accent-glow disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-y-0 disabled:hover:shadow-none"
           >
             {saving ? (
               <>

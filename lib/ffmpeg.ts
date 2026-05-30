@@ -54,7 +54,7 @@ export async function downloadToTemp(url: string, destPath: string): Promise<str
  */
 export async function normalizeVideo(
   inputPath: string,
-  outputPath: string,
+  outputPath: string
 ): Promise<string | null> {
   if (!(await isFfmpegAvailable())) {
     console.warn('[ffmpeg] not available, skipping normalization')
@@ -66,17 +66,25 @@ export async function normalizeVideo(
       FFMPEG_BIN,
       [
         '-y',
-        '-i', inputPath,
-        '-c:v', 'libx264',
-        '-preset', 'medium',
-        '-crf', '20',
-        '-pix_fmt', 'yuv420p',
-        '-c:a', 'aac',
-        '-b:a', '128k',
-        '-movflags', '+faststart',
+        '-i',
+        inputPath,
+        '-c:v',
+        'libx264',
+        '-preset',
+        'medium',
+        '-crf',
+        '20',
+        '-pix_fmt',
+        'yuv420p',
+        '-c:a',
+        'aac',
+        '-b:a',
+        '128k',
+        '-movflags',
+        '+faststart',
         outputPath,
       ],
-      { timeout: 5 * 60_000, maxBuffer: 10 * 1024 * 1024 },
+      { timeout: 5 * 60_000, maxBuffer: 10 * 1024 * 1024 }
     )
     return outputPath
   } catch (err) {
@@ -92,7 +100,7 @@ export async function normalizeVideo(
 export async function extractThumbnail(
   inputPath: string,
   outputPath: string,
-  timestampSecs = 0.5,
+  timestampSecs = 0.5
 ): Promise<string | null> {
   if (!(await isFfmpegAvailable())) {
     return null
@@ -102,13 +110,17 @@ export async function extractThumbnail(
       FFMPEG_BIN,
       [
         '-y',
-        '-ss', String(timestampSecs),
-        '-i', inputPath,
-        '-frames:v', '1',
-        '-q:v', '3',
+        '-ss',
+        String(timestampSecs),
+        '-i',
+        inputPath,
+        '-frames:v',
+        '1',
+        '-q:v',
+        '3',
         outputPath,
       ],
-      { timeout: 60_000 },
+      { timeout: 60_000 }
     )
     return outputPath
   } catch (err) {
@@ -131,13 +143,8 @@ export async function probeVideo(path: string): Promise<VideoProbeResult> {
   try {
     const { stdout } = await execFileAsync(
       FFPROBE_BIN,
-      [
-        '-v', 'error',
-        '-show_entries', 'stream=width,height:format=duration',
-        '-of', 'json',
-        path,
-      ],
-      { timeout: 30_000 },
+      ['-v', 'error', '-show_entries', 'stream=width,height:format=duration', '-of', 'json', path],
+      { timeout: 30_000 }
     )
     const parsed = JSON.parse(stdout)
     const stream = parsed.streams?.[0] ?? {}

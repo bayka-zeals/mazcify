@@ -8,12 +8,7 @@ import {
   PixVerseError,
   type VideoClipResult,
 } from '@/lib/pixverse'
-import {
-  ensureWorkDir,
-  isFfmpegAvailable,
-  normalizeVideo,
-  extractThumbnail,
-} from '@/lib/ffmpeg'
+import { ensureWorkDir, isFfmpegAvailable, normalizeVideo, extractThumbnail } from '@/lib/ffmpeg'
 import { getVideoTemplateById, resolveTemplatePrompts } from '@/video_templates'
 import { VIDEO_CONFIG, PLAN_LIMITS, isAdmin } from '@/config/constants'
 import type { VideoProgressEvent } from '@/types'
@@ -72,7 +67,7 @@ export async function POST(req: NextRequest) {
   if (!parsed.success) {
     return NextResponse.json(
       { error: 'Validation failed', details: parsed.error.flatten().fieldErrors },
-      { status: 400 },
+      { status: 400 }
     )
   }
 
@@ -101,7 +96,7 @@ export async function POST(req: NextRequest) {
         code: 'limit_reached',
         message: `You've reached your free plan limit of ${videoLimit} video${videoLimit === 1 ? '' : 's'}. Delete an existing video or upgrade.`,
       },
-      { status: 402 },
+      { status: 402 }
     )
   }
 
@@ -112,7 +107,7 @@ export async function POST(req: NextRequest) {
 
   const resolved = resolveTemplatePrompts(
     template,
-    mascotDescription || mascotName || 'the mascot character',
+    mascotDescription || mascotName || 'the mascot character'
   )
   const sortedClips = [...resolved.clips].sort((a, b) => a.index - b.index)
   const totalClips = sortedClips.length
@@ -173,7 +168,7 @@ export async function POST(req: NextRequest) {
               duration: sortedClips[0].duration ?? VIDEO_CONFIG.clipDurationSecs,
               cliTimeoutSecs: VIDEO_CONFIG.cliTimeoutSecs,
             }),
-          VIDEO_CONFIG.maxRetries,
+          VIDEO_CONFIG.maxRetries
         )
 
         clipResults.push({ ...first, clipIndex: sortedClips[0].index })
@@ -210,7 +205,7 @@ export async function POST(req: NextRequest) {
                   duration: clip.duration ?? VIDEO_CONFIG.clipDurationSecs,
                   cliTimeoutSecs: VIDEO_CONFIG.cliTimeoutSecs,
                 }),
-              VIDEO_CONFIG.maxRetries,
+              VIDEO_CONFIG.maxRetries
             )
 
             clipResults.push({ ...extended, clipIndex: clip.index })
@@ -226,8 +221,7 @@ export async function POST(req: NextRequest) {
             })
           } catch (err) {
             failedAtClip = i + 1
-            lastErrorMessage =
-              err instanceof Error ? err.message : 'Unknown error during extend'
+            lastErrorMessage = err instanceof Error ? err.message : 'Unknown error during extend'
             console.error(`[/api/video] extend failed at clip ${i + 1}:`, err)
             break
           }
@@ -257,7 +251,7 @@ export async function POST(req: NextRequest) {
 
         const totalDuration = clipResults.reduce(
           (sum, c) => sum + (c.duration || VIDEO_CONFIG.clipDurationSecs),
-          0,
+          0
         )
 
         // Best-effort FFmpeg post-processing: download via PixVerse CLI,
@@ -269,16 +263,9 @@ export async function POST(req: NextRequest) {
           if (await isFfmpegAvailable()) {
             const workDir = await ensureWorkDir(videoId)
             const downloadedPath = await downloadVideo(lastResult.videoId, workDir)
-            const normalizedPath = await normalizeVideo(
-              downloadedPath,
-              join(workDir, 'final.mp4'),
-            )
+            const normalizedPath = await normalizeVideo(downloadedPath, join(workDir, 'final.mp4'))
             if (normalizedPath) {
-              await extractThumbnail(
-                normalizedPath,
-                join(workDir, 'thumb.jpg'),
-                0.5,
-              )
+              await extractThumbnail(normalizedPath, join(workDir, 'thumb.jpg'), 0.5)
               finalServedUrl = `/api/video/file?videoId=${encodeURIComponent(videoId)}&kind=video`
             }
           }
@@ -326,10 +313,7 @@ export async function POST(req: NextRequest) {
   })
 }
 
-async function runWithRetry<T>(
-  fn: () => Promise<T>,
-  maxRetries: number,
-): Promise<T> {
+async function runWithRetry<T>(fn: () => Promise<T>, maxRetries: number): Promise<T> {
   let lastError: unknown
   for (let attempt = 0; attempt <= maxRetries; attempt++) {
     try {
@@ -346,7 +330,7 @@ async function runWithRetry<T>(
       console.warn(
         `[/api/video] attempt ${attempt + 1} failed, ${
           attempt < maxRetries ? 'retrying' : 'giving up'
-        }`,
+        }`
       )
     }
   }

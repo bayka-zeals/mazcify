@@ -76,13 +76,7 @@ export interface CharacterSheet {
 // ------------------------------------------------------------
 // Video
 // ------------------------------------------------------------
-export type VideoStatus =
-  | 'pending'
-  | 'generating'
-  | 'extending'
-  | 'processing'
-  | 'done'
-  | 'failed'
+export type VideoStatus = 'pending' | 'generating' | 'extending' | 'processing' | 'done' | 'failed'
 
 export type VideoFeedback = 'like' | 'dislike' | null
 
@@ -95,17 +89,17 @@ export interface Video {
   templateId: string
   templateName: string
   status: VideoStatus
-  currentClip: number          // 0..clipCount, progress tracker
-  totalClips: number           // typically 6
-  clipVideoIds: string[]       // PixVerse video IDs per clip
+  currentClip: number // 0..clipCount, progress tracker
+  totalClips: number // typically 6
+  clipVideoIds: string[] // PixVerse video IDs per clip
   finalVideoUrl: string | null // Firebase Storage URL
   pixverseCdnUrl: string | null
   thumbnailUrl: string | null
-  duration: number             // total seconds
-  liked: VideoFeedback         // null = no feedback
-  deleted: boolean             // soft delete flag
+  duration: number // total seconds
+  liked: VideoFeedback // null = no feedback
+  deleted: boolean // soft delete flag
   errorMessage?: string
-  partial?: boolean            // true if generation stopped mid-way
+  partial?: boolean // true if generation stopped mid-way
   createdAt: string
   updatedAt: string
 }
@@ -130,17 +124,17 @@ export interface PromptTemplate {
 // Video Templates (predefined story arcs)
 // ------------------------------------------------------------
 export interface VideoTemplateClip {
-  index: number          // 1-based clip order
-  prompt: string         // contains {mascot_description} placeholder
-  duration: number       // seconds (typically 5)
+  index: number // 1-based clip order
+  prompt: string // contains {mascot_description} placeholder
+  duration: number // seconds (typically 5)
 }
 
 export interface VideoTemplate {
-  id: string             // matches folder UUID
+  id: string // matches folder UUID
   name: string
   description: string
-  thumbnail: string      // public path or URL
-  model: string          // pixverse model id (default pixverse-c1)
+  thumbnail: string // public path or URL
+  model: string // pixverse model id (default pixverse-c1)
   clips: VideoTemplateClip[]
 }
 

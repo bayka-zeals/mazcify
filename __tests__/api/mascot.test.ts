@@ -16,10 +16,7 @@ import { generateImages, generateCharacterSheet } from '@/lib/pixverse'
 const mockGenerateImages = generateImages as jest.Mock
 const mockGenerateCharacterSheet = generateCharacterSheet as jest.Mock
 
-function makeRequest(
-  method: string,
-  body: Record<string, unknown>,
-): NextRequest {
+function makeRequest(method: string, body: Record<string, unknown>): NextRequest {
   return new NextRequest('http://localhost:3000/api/mascot', {
     method,
     headers: { 'Content-Type': 'application/json' },
@@ -38,7 +35,7 @@ describe('POST /api/mascot', () => {
         userId: 'u1',
         brandId: 'b1',
         mascotId: 'm1',
-      }),
+      })
     )
     expect(res.status).toBe(400)
   })
@@ -56,7 +53,7 @@ describe('POST /api/mascot', () => {
         brandId: 'b1',
         mascotId: 'm1',
         imagePrompt: 'A cool mascot',
-      }),
+      })
     )
 
     expect(res.status).toBe(200)
@@ -75,7 +72,7 @@ describe('PATCH /api/mascot', () => {
         mascotId: 'm1',
         chosenImageUrl: 'https://img.png',
         gender: 'male',
-      }),
+      })
     )
     expect(res.status).toBe(400)
   })
@@ -95,7 +92,7 @@ describe('PATCH /api/mascot', () => {
         chosenImageUrl: 'https://img.pixverse.ai/chosen.png',
         gender: 'female',
         mascotName: 'Foxy',
-      }),
+      })
     )
 
     expect(res.status).toBe(200)
@@ -105,9 +102,7 @@ describe('PATCH /api/mascot', () => {
   })
 
   it('returns 500 when character sheet generation exhausts all fallback models', async () => {
-    mockGenerateCharacterSheet.mockRejectedValueOnce(
-      new Error('All character sheet models failed'),
-    )
+    mockGenerateCharacterSheet.mockRejectedValueOnce(new Error('All character sheet models failed'))
 
     const res = await PATCH(
       makeRequest('PATCH', {
@@ -117,7 +112,7 @@ describe('PATCH /api/mascot', () => {
         chosenVariationId: 'v1',
         chosenImageUrl: 'https://img.pixverse.ai/chosen.png',
         gender: 'male',
-      }),
+      })
     )
 
     expect(res.status).toBe(500)

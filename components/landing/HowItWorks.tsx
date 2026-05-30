@@ -18,33 +18,31 @@ const steps = [
 
 export default function HowItWorks() {
   return (
-    <section id="how-it-works" className="max-w-6xl mx-auto px-12 py-28">
-      <p className="text-accent text-xs font-semibold tracking-[3px] uppercase mb-4">The Process</p>
+    <section id="how-it-works" className="mx-auto max-w-6xl px-12 py-28">
+      <p className="mb-4 text-xs font-semibold uppercase tracking-[3px] text-accent">The Process</p>
       <h2
-        className="font-display uppercase leading-none tracking-wide mb-16"
+        className="mb-16 font-display uppercase leading-none tracking-wide"
         style={{ fontSize: 'clamp(40px, 5vw, 72px)' }}
       >
-        Three steps.<br />One mascot.
+        Three steps.
+        <br />
+        One mascot.
       </h2>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-0.5">
+      <div className="grid grid-cols-1 gap-0.5 md:grid-cols-3">
         {steps.map((step, i) => (
           <div
             key={step.num}
-            className={`
-              group bg-surface hover:bg-surface2 transition-colors relative overflow-hidden p-10
-              ${i === 0 ? 'rounded-l-xl' : ''}
-              ${i === steps.length - 1 ? 'rounded-r-xl' : ''}
-            `}
+            className={`group relative overflow-hidden bg-surface p-10 transition-colors hover:bg-surface2 ${i === 0 ? 'rounded-l-xl' : ''} ${i === steps.length - 1 ? 'rounded-r-xl' : ''} `}
           >
             {/* Top bar */}
-            <div className="absolute top-0 left-0 right-0 h-0.5 bg-border group-hover:bg-accent transition-colors duration-300" />
+            <div className="absolute left-0 right-0 top-0 h-0.5 bg-border transition-colors duration-300 group-hover:bg-accent" />
 
-            <div className="font-display text-5xl text-accent/20 group-hover:text-accent/30 transition-colors mb-6 leading-none">
+            <div className="mb-6 font-display text-5xl leading-none text-accent/20 transition-colors group-hover:text-accent/30">
               {step.num}
             </div>
-            <h3 className="text-lg font-semibold text-text mb-3">{step.title}</h3>
-            <p className="text-sm text-muted leading-relaxed">{step.desc}</p>
+            <h3 className="mb-3 text-lg font-semibold text-text">{step.title}</h3>
+            <p className="text-sm leading-relaxed text-muted">{step.desc}</p>
           </div>
         ))}
       </div>

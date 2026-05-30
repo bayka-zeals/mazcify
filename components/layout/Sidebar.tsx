@@ -7,8 +7,8 @@ import { Home, Wand2, Settings, ChevronLeft, ChevronRight } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 const navItems = [
-  { icon: Home,    label: 'Home',     href: '/dashboard' },
-  { icon: Wand2,   label: 'Creation', href: '/dashboard/creation' },
+  { icon: Home, label: 'Home', href: '/dashboard' },
+  { icon: Wand2, label: 'Creation', href: '/dashboard/creation' },
   { icon: Settings, label: 'Settings', href: '/dashboard/settings' },
 ]
 
@@ -19,40 +19,37 @@ export default function Sidebar() {
   return (
     <aside
       className={cn(
-        'flex flex-col bg-surface border-r border-border transition-all duration-300 ease-in-out shrink-0',
+        'flex shrink-0 flex-col border-r border-border bg-surface transition-all duration-300 ease-in-out',
         collapsed ? 'w-16' : 'w-60'
       )}
     >
       {/* Nav items */}
-      <nav className="flex flex-col gap-1 p-3 flex-1 mt-2">
+      <nav className="mt-2 flex flex-1 flex-col gap-1 p-3">
         {navItems.map(({ icon: Icon, label, href }) => {
-          const isActive =
-            href === '/dashboard'
-              ? pathname === href
-              : pathname.startsWith(href)
+          const isActive = href === '/dashboard' ? pathname === href : pathname.startsWith(href)
           return (
             <Link
               key={href}
               href={href}
               title={collapsed ? label : undefined}
               className={cn(
-                'flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-150 relative group',
+                'group relative flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-150',
                 isActive
-                  ? 'text-accent bg-accent/10'
-                  : 'text-muted hover:text-text hover:bg-surface2',
+                  ? 'bg-accent/10 text-accent'
+                  : 'text-muted hover:bg-surface2 hover:text-text',
                 collapsed && 'justify-center px-2'
               )}
             >
               {/* Active left border */}
               {isActive && (
-                <span className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-5 bg-accent rounded-r-full" />
+                <span className="absolute left-0 top-1/2 h-5 w-0.5 -translate-y-1/2 rounded-r-full bg-accent" />
               )}
               <Icon size={18} className={isActive ? 'text-accent' : ''} />
               {!collapsed && <span>{label}</span>}
 
               {/* Tooltip when collapsed */}
               {collapsed && (
-                <span className="absolute left-full ml-3 px-2 py-1 bg-surface2 border border-border text-text text-xs rounded-md whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">
+                <span className="pointer-events-none absolute left-full z-50 ml-3 whitespace-nowrap rounded-md border border-border bg-surface2 px-2 py-1 text-xs text-text opacity-0 transition-opacity group-hover:opacity-100">
                   {label}
                 </span>
               )}
@@ -62,11 +59,11 @@ export default function Sidebar() {
       </nav>
 
       {/* Collapse toggle */}
-      <div className="p-3 border-t border-border">
+      <div className="border-t border-border p-3">
         <button
           onClick={() => setCollapsed(!collapsed)}
           className={cn(
-            'flex items-center gap-3 w-full px-3 py-2.5 rounded-lg text-muted hover:text-text hover:bg-surface2 text-sm transition-all',
+            'flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-muted transition-all hover:bg-surface2 hover:text-text',
             collapsed && 'justify-center px-2'
           )}
         >

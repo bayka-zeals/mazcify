@@ -67,7 +67,7 @@ export function clearVideoTemplateCache() {
  */
 export function resolveTemplatePrompts(
   template: VideoTemplate,
-  mascotDescription: string,
+  mascotDescription: string
 ): VideoTemplate {
   const safeDesc =
     mascotDescription && mascotDescription.trim().length > 0

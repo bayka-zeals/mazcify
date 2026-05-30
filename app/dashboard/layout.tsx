@@ -16,12 +16,12 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-bg flex items-center justify-center">
+      <div className="flex min-h-screen items-center justify-center bg-bg">
         <div className="flex flex-col items-center gap-4">
-          <div className="font-display text-2xl tracking-widest text-text uppercase">
+          <div className="font-display text-2xl uppercase tracking-widest text-text">
             MAZC<span className="text-accent">I</span>FY
           </div>
-          <div className="w-1 h-1 rounded-full bg-accent animate-glow-pulse" />
+          <div className="animate-glow-pulse h-1 w-1 rounded-full bg-accent" />
         </div>
       </div>
     )
@@ -30,13 +30,11 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   if (!user) return null
 
   return (
-    <div className="min-h-screen bg-bg flex flex-col">
+    <div className="flex min-h-screen flex-col bg-bg">
       <Topbar />
       <div className="flex flex-1 pt-[64px]">
         <Sidebar />
-        <main className="flex-1 overflow-auto p-8">
-          {children}
-        </main>
+        <main className="flex-1 overflow-auto p-8">{children}</main>
       </div>
     </div>
   )

@@ -97,7 +97,7 @@ export default function Step1Form({ currentMascotCount, onSuccess }: Step1FormPr
             const ref = storageRef(storage, path)
             await uploadBytes(ref, file)
             return await getDownloadURL(ref)
-          }),
+          })
         )
       }
 
@@ -140,13 +140,13 @@ export default function Step1Form({ currentMascotCount, onSuccess }: Step1FormPr
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      <div className="bg-surface border border-border rounded-xl p-6 sm:p-8 space-y-6">
+      <div className="space-y-6 rounded-xl border border-border bg-surface p-6 sm:p-8">
         {/* URL */}
         <Field label="Business URL" required>
           <div className="relative">
             <LinkIcon
               size={16}
-              className="absolute left-3 top-1/2 -translate-y-1/2 text-muted pointer-events-none"
+              className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-muted"
             />
             <input
               type="url"
@@ -154,7 +154,7 @@ export default function Step1Form({ currentMascotCount, onSuccess }: Step1FormPr
               value={url}
               onChange={(e) => setUrl(e.target.value)}
               placeholder="https://yourcompany.com"
-              className="w-full bg-surface2 border border-border rounded-lg pl-10 pr-4 py-3 text-sm text-text placeholder:text-muted focus:outline-none focus:border-accent transition-colors"
+              className="w-full rounded-lg border border-border bg-surface2 py-3 pl-10 pr-4 text-sm text-text transition-colors placeholder:text-muted focus:border-accent focus:outline-none"
             />
           </div>
         </Field>
@@ -172,7 +172,7 @@ export default function Step1Form({ currentMascotCount, onSuccess }: Step1FormPr
             onDragLeave={() => setDragActive(false)}
             onDrop={handleDrop}
             className={[
-              'block border border-dashed rounded-lg px-6 py-8 text-center cursor-pointer transition-colors',
+              'block cursor-pointer rounded-lg border border-dashed px-6 py-8 text-center transition-colors',
               dragActive
                 ? 'border-accent bg-accent/5'
                 : 'border-border bg-surface2 hover:border-accent/50',
@@ -186,13 +186,11 @@ export default function Step1Form({ currentMascotCount, onSuccess }: Step1FormPr
               onChange={(e) => e.target.files && addFiles(e.target.files)}
               className="hidden"
             />
-            <Upload size={20} className="mx-auto text-muted mb-2" />
-            <p className="text-sm text-text font-medium">
+            <Upload size={20} className="mx-auto mb-2 text-muted" />
+            <p className="text-sm font-medium text-text">
               Drop files here or <span className="text-accent">browse</span>
             </p>
-            <p className="text-xs text-muted mt-1">
-              {ACCEPTED_EXT.join(' · ').toUpperCase()}
-            </p>
+            <p className="mt-1 text-xs text-muted">{ACCEPTED_EXT.join(' · ').toUpperCase()}</p>
           </label>
 
           {files.length > 0 && (
@@ -200,13 +198,13 @@ export default function Step1Form({ currentMascotCount, onSuccess }: Step1FormPr
               {files.map((file, idx) => (
                 <li
                   key={`${file.name}-${idx}`}
-                  className="flex items-center justify-between bg-surface2 border border-border rounded-lg px-3 py-2 text-xs"
+                  className="flex items-center justify-between rounded-lg border border-border bg-surface2 px-3 py-2 text-xs"
                 >
                   <span className="truncate text-text">{file.name}</span>
                   <button
                     type="button"
                     onClick={() => removeFile(idx)}
-                    className="text-muted hover:text-text transition-colors ml-3 shrink-0"
+                    className="ml-3 shrink-0 text-muted transition-colors hover:text-text"
                     aria-label={`Remove ${file.name}`}
                   >
                     <X size={14} />
@@ -224,7 +222,7 @@ export default function Step1Form({ currentMascotCount, onSuccess }: Step1FormPr
             value={mascotName}
             onChange={(e) => setMascotName(e.target.value)}
             placeholder="e.g. Mazzy, Foxy, Rocket…"
-            className="w-full bg-surface2 border border-border rounded-lg px-4 py-3 text-sm text-text placeholder:text-muted focus:outline-none focus:border-accent transition-colors"
+            className="w-full rounded-lg border border-border bg-surface2 px-4 py-3 text-sm text-text transition-colors placeholder:text-muted focus:border-accent focus:outline-none"
           />
         </Field>
 
@@ -237,10 +235,10 @@ export default function Step1Form({ currentMascotCount, onSuccess }: Step1FormPr
                 type="button"
                 onClick={() => setGender(g)}
                 className={[
-                  'px-4 py-2.5 rounded-lg text-sm font-medium capitalize border transition-colors',
+                  'rounded-lg border px-4 py-2.5 text-sm font-medium capitalize transition-colors',
                   gender === g
-                    ? 'bg-accent/10 border-accent text-accent'
-                    : 'bg-surface2 border-border text-muted hover:text-text hover:border-white/15',
+                    ? 'border-accent bg-accent/10 text-accent'
+                    : 'border-border bg-surface2 text-muted hover:border-white/15 hover:text-text',
                 ].join(' ')}
               >
                 {g === 'neutral' ? 'Neutral' : g}
@@ -259,13 +257,13 @@ export default function Step1Form({ currentMascotCount, onSuccess }: Step1FormPr
             onChange={(e) => setDescription(e.target.value)}
             rows={4}
             placeholder="Friendly, bold, energetic — describe your mascot's personality"
-            className="w-full bg-surface2 border border-border rounded-lg px-4 py-3 text-sm text-text placeholder:text-muted focus:outline-none focus:border-accent transition-colors resize-none"
+            className="w-full resize-none rounded-lg border border-border bg-surface2 px-4 py-3 text-sm text-text transition-colors placeholder:text-muted focus:border-accent focus:outline-none"
           />
         </Field>
       </div>
 
       {error && (
-        <div className="bg-red-500/10 border border-red-500/30 text-red-300 rounded-lg px-4 py-3 text-sm">
+        <div className="rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-300">
           {error}
         </div>
       )}
@@ -278,7 +276,7 @@ export default function Step1Form({ currentMascotCount, onSuccess }: Step1FormPr
         <button
           type="submit"
           disabled={loading}
-          className="inline-flex items-center gap-2 bg-accent text-bg text-sm font-bold tracking-wider uppercase px-8 py-3.5 rounded-md hover:shadow-accent-glow hover:-translate-y-0.5 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0 disabled:hover:shadow-none"
+          className="inline-flex items-center gap-2 rounded-md bg-accent px-8 py-3.5 text-sm font-bold uppercase tracking-wider text-bg transition-all duration-200 hover:-translate-y-0.5 hover:shadow-accent-glow disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-y-0 disabled:hover:shadow-none"
         >
           {loading ? (
             <GenerationProgress messages={PROMPT_GENERATION_MESSAGES} variant="inline" />
@@ -304,7 +302,7 @@ function Field({
 }) {
   return (
     <div>
-      <div className="flex items-baseline justify-between mb-2">
+      <div className="mb-2 flex items-baseline justify-between">
         <label className="text-xs font-semibold uppercase tracking-wider text-muted">
           {label} {required && <span className="text-accent">*</span>}
         </label>

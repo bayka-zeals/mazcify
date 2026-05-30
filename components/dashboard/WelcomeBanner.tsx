@@ -8,11 +8,12 @@ export default function WelcomeBanner() {
 
   return (
     <div className="mb-8">
-      <h1 className="font-display text-4xl uppercase tracking-wide text-text leading-none">
-        WELCOME BACK,<br />
+      <h1 className="font-display text-4xl uppercase leading-none tracking-wide text-text">
+        WELCOME BACK,
+        <br />
         <span className="text-accent">{firstName.toUpperCase()}</span>
       </h1>
-      <p className="text-muted text-sm mt-3">Here&apos;s your brand overview.</p>
+      <p className="mt-3 text-sm text-muted">Here&apos;s your brand overview.</p>
     </div>
   )
 }

@@ -24,7 +24,7 @@ function domainFromUrl(url: string): string {
 export async function analyzeBrand(
   scraped: ScrapedContent,
   pdfTexts: string[],
-  url: string,
+  url: string
 ): Promise<{ meta: BrandAnalysis; brandbook: string }> {
   const client = getClient()
 
@@ -32,12 +32,9 @@ export async function analyzeBrand(
     `Website URL: ${url}`,
     scraped.title && `Title: ${scraped.title}`,
     scraped.metaDescription && `Meta Description: ${scraped.metaDescription}`,
-    scraped.headings.length > 0 &&
-      `Headings:\n${scraped.headings.join('\n')}`,
+    scraped.headings.length > 0 && `Headings:\n${scraped.headings.join('\n')}`,
     scraped.bodyText && `Body Text:\n${scraped.bodyText}`,
-    ...pdfTexts
-      .filter(Boolean)
-      .map((t, i) => `PDF Document ${i + 1}:\n${t}`),
+    ...pdfTexts.filter(Boolean).map((t, i) => `PDF Document ${i + 1}:\n${t}`),
   ]
     .filter(Boolean)
     .join('\n\n')
@@ -75,9 +72,7 @@ If the website content is empty or minimal, infer what you can from the URL doma
       colors: Array.isArray(parsed.colors) ? parsed.colors : [],
       tone: parsed.tone || 'professional',
       taglines: Array.isArray(parsed.taglines) ? parsed.taglines : [],
-      productNames: Array.isArray(parsed.productNames)
-        ? parsed.productNames
-        : [],
+      productNames: Array.isArray(parsed.productNames) ? parsed.productNames : [],
     }
 
     return {
@@ -102,7 +97,7 @@ If the website content is empty or minimal, infer what you can from the URL doma
 
 export async function generateImagePrompt(
   meta: BrandAnalysis,
-  params: { gender: string; description?: string; mascotName?: string },
+  params: { gender: string; description?: string; mascotName?: string }
 ): Promise<string> {
   const client = getClient()
 

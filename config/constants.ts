@@ -39,17 +39,17 @@ export function isAdmin(uid: string | null | undefined): boolean {
 // Mascot generation
 // ------------------------------------------------------------
 export const MASCOT_CONFIG = {
-  variationCount: 3,       // number of variations to generate
-  imageSize: '1024x1024',  // PixVerse image size
+  variationCount: 3, // number of variations to generate
+  imageSize: '1024x1024', // PixVerse image size
 } as const
 
 // ------------------------------------------------------------
 // Video generation
 // ------------------------------------------------------------
 export const VIDEO_CONFIG = {
-  clipCount: 6,            // clips per video (1 reference + 5 extends)
-  clipDurationSecs: 5,     // seconds per clip
-  totalDurationSecs: 30,   // total duration target
+  clipCount: 6, // clips per video (1 reference + 5 extends)
+  clipDurationSecs: 5, // seconds per clip
+  totalDurationSecs: 30, // total duration target
   defaultModel: 'pixverse-c1',
   quality: '1080p',
   aspectRatio: '16:9',
@@ -92,11 +92,11 @@ export type PersonalityTrait = (typeof PERSONALITY_TRAITS)[number]
 // Routes
 // ------------------------------------------------------------
 export const ROUTES = {
-  home:        '/',
-  login:       '/login',
-  dashboard:   '/dashboard',
-  creation:    '/dashboard/creation',
+  home: '/',
+  login: '/login',
+  dashboard: '/dashboard',
+  creation: '/dashboard/creation',
   creationNew: '/dashboard/creation/new',
-  videoNew:    '/dashboard/creation/video',
-  settings:    '/dashboard/settings',
+  videoNew: '/dashboard/creation/video',
+  settings: '/dashboard/settings',
 } as const

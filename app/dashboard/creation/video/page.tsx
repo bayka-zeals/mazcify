@@ -90,9 +90,7 @@ export default function VideoGenerationPage() {
         if (cancelled) return
         setMascots(mascotList)
         setVideoCount(videoList.length)
-        setTemplates(
-          (templateRes.templates as VideoTemplateSummary[] | undefined) ?? [],
-        )
+        setTemplates((templateRes.templates as VideoTemplateSummary[] | undefined) ?? [])
       } catch (err) {
         if (cancelled) return
         console.error('Failed to load video page data:', err)
@@ -124,7 +122,7 @@ export default function VideoGenerationPage() {
     if (!user || !selectedMascot || !selectedTemplateId) return
     if (limitReached) {
       setError(
-        `You've reached your free plan limit of ${PLAN_LIMITS.free.videosMax} video${PLAN_LIMITS.free.videosMax === 1 ? '' : 's'}. Delete an existing video first.`,
+        `You've reached your free plan limit of ${PLAN_LIMITS.free.videosMax} video${PLAN_LIMITS.free.videosMax === 1 ? '' : 's'}. Delete an existing video first.`
       )
       return
     }
@@ -142,8 +140,7 @@ export default function VideoGenerationPage() {
         mascotName: selectedMascot.name,
         mascotImageUrl: selectedMascot.chosenImageUrl,
         templateId: selectedTemplateId,
-        templateName:
-          templates.find((t) => t.id === selectedTemplateId)?.name ?? 'Video',
+        templateName: templates.find((t) => t.id === selectedTemplateId)?.name ?? 'Video',
         totalClips: 6,
       })
     } catch (err) {
@@ -189,20 +186,14 @@ export default function VideoGenerationPage() {
 
       if (!res.ok) {
         const errBody = await res.json().catch(() => ({}))
-        const message =
-          errBody.message || errBody.error || `Request failed (${res.status})`
+        const message = errBody.message || errBody.error || `Request failed (${res.status})`
         throw new Error(message)
       }
 
       if (!res.body) throw new Error('Streaming not supported by this browser.')
 
       await consumeSseStream(res.body, async (event) => {
-        await handleProgressEvent(
-          event,
-          videoId,
-          selectedMascot.brandId,
-          user.uid,
-        )
+        await handleProgressEvent(event, videoId, selectedMascot.brandId, user.uid)
       })
     } catch (err) {
       if (controller.signal.aborted) {
@@ -218,7 +209,7 @@ export default function VideoGenerationPage() {
               status: 'failed',
               errorMessage: message,
             }
-          : prev,
+          : prev
       )
       try {
         await failVideo(user.uid, selectedMascot.brandId, videoId, message)
@@ -234,7 +225,7 @@ export default function VideoGenerationPage() {
     event: VideoProgressEvent,
     videoId: string,
     brandId: string,
-    uid: string,
+    uid: string
   ) => {
     setGeneration((prev) => {
       if (!prev) return prev
@@ -332,16 +323,11 @@ export default function VideoGenerationPage() {
 
     setSaving(true)
     try {
-      const sourceUrl =
-        generation.finalVideoUrl ?? generation.pixverseCdnUrl!
+      const sourceUrl = generation.finalVideoUrl ?? generation.pixverseCdnUrl!
       // Best-effort: back up to Firebase Storage
       let backupUrl: string | null = null
       try {
-        backupUrl = await uploadVideoBackup(
-          user.uid,
-          generation.videoId,
-          sourceUrl,
-        )
+        backupUrl = await uploadVideoBackup(user.uid, generation.videoId, sourceUrl)
       } catch (uploadErr) {
         console.warn('Storage backup failed (will keep PixVerse URL):', uploadErr)
       }
@@ -367,12 +353,7 @@ export default function VideoGenerationPage() {
     if (!user || !generation || !selectedMascot) return
     setFeedback(next)
     try {
-      await setVideoFeedback(
-        user.uid,
-        selectedMascot.brandId,
-        generation.videoId,
-        next,
-      )
+      await setVideoFeedback(user.uid, selectedMascot.brandId, generation.videoId, next)
     } catch (err) {
       console.warn('Failed to save feedback:', err)
     }
@@ -383,11 +364,7 @@ export default function VideoGenerationPage() {
     if (!confirm('Delete this video? It will disappear from your gallery.')) return
 
     try {
-      await softDeleteVideo(
-        user.uid,
-        selectedMascot.brandId,
-        generation.videoId,
-      )
+      await softDeleteVideo(user.uid, selectedMascot.brandId, generation.videoId)
       router.push('/dashboard/creation')
     } catch (err) {
       console.error('Delete failed:', err)
@@ -407,15 +384,15 @@ export default function VideoGenerationPage() {
             : 'clip'
 
   return (
-    <div className="max-w-5xl mx-auto space-y-8">
+    <div className="mx-auto max-w-5xl space-y-8">
       <div>
         <Link
           href="/dashboard/creation"
-          className="inline-flex items-center gap-2 text-xs text-muted hover:text-text transition-colors mb-4"
+          className="mb-4 inline-flex items-center gap-2 text-xs text-muted transition-colors hover:text-text"
         >
           <ArrowLeft size={14} /> Back to Creation
         </Link>
-        <p className="text-accent text-xs font-semibold tracking-[3px] uppercase mb-1">
+        <p className="mb-1 text-xs font-semibold uppercase tracking-[3px] text-accent">
           Step 2 — Video Generation
         </p>
         <h1 className="font-display text-3xl uppercase tracking-wide text-text">
@@ -426,37 +403,32 @@ export default function VideoGenerationPage() {
       <PhaseIndicator phase={phase} />
 
       {error && (
-        <div className="bg-red-500/10 border border-red-500/30 text-red-300 rounded-lg px-4 py-3 text-sm flex items-start gap-2">
-          <AlertCircle size={16} className="shrink-0 mt-0.5" />
+        <div className="flex items-start gap-2 rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-300">
+          <AlertCircle size={16} className="mt-0.5 shrink-0" />
           <span>{error}</span>
         </div>
       )}
 
       {limitReached && phase !== 'preview' && (
-        <div className="bg-yellow-500/10 border border-yellow-500/30 text-yellow-200 rounded-lg px-4 py-3 text-sm">
-          You&apos;ve reached the free plan limit of{' '}
-          {PLAN_LIMITS.free.videosMax} video
-          {PLAN_LIMITS.free.videosMax === 1 ? '' : 's'}. Delete an existing video to make
-          room or upgrade.
+        <div className="rounded-lg border border-yellow-500/30 bg-yellow-500/10 px-4 py-3 text-sm text-yellow-200">
+          You&apos;ve reached the free plan limit of {PLAN_LIMITS.free.videosMax} video
+          {PLAN_LIMITS.free.videosMax === 1 ? '' : 's'}. Delete an existing video to make room or
+          upgrade.
         </div>
       )}
 
       {phase === 'mascot' && (
         <section className="space-y-5">
           <div>
-            <h2 className="text-sm font-semibold uppercase tracking-wider text-text mb-1">
+            <h2 className="mb-1 text-sm font-semibold uppercase tracking-wider text-text">
               01 · Choose a mascot
             </h2>
-            <p className="text-xs text-muted">
-              Pick the mascot you want to star in the video.
-            </p>
+            <p className="text-xs text-muted">Pick the mascot you want to star in the video.</p>
           </div>
           <MascotSelector
             mascots={mascots}
             selectedKey={
-              selectedMascot
-                ? `${selectedMascot.brandId}-${selectedMascot.mascotId}`
-                : null
+              selectedMascot ? `${selectedMascot.brandId}-${selectedMascot.mascotId}` : null
             }
             onSelect={setSelectedMascot}
             loading={loadingState.mascots}
@@ -466,7 +438,7 @@ export default function VideoGenerationPage() {
               type="button"
               disabled={!selectedMascot}
               onClick={() => setPhase('template')}
-              className="inline-flex items-center gap-2 bg-accent text-bg text-sm font-bold tracking-wider uppercase px-8 py-3.5 rounded-md hover:shadow-accent-glow hover:-translate-y-0.5 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0 disabled:hover:shadow-none"
+              className="inline-flex items-center gap-2 rounded-md bg-accent px-8 py-3.5 text-sm font-bold uppercase tracking-wider text-bg transition-all duration-200 hover:-translate-y-0.5 hover:shadow-accent-glow disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-y-0 disabled:hover:shadow-none"
             >
               Next <ArrowRight size={16} />
             </button>
@@ -477,7 +449,7 @@ export default function VideoGenerationPage() {
       {phase === 'template' && (
         <section className="space-y-5">
           <div>
-            <h2 className="text-sm font-semibold uppercase tracking-wider text-text mb-1">
+            <h2 className="mb-1 text-sm font-semibold uppercase tracking-wider text-text">
               02 · Choose a video template
             </h2>
             <p className="text-xs text-muted">
@@ -494,7 +466,7 @@ export default function VideoGenerationPage() {
             <button
               type="button"
               onClick={() => setPhase('mascot')}
-              className="text-xs font-medium text-muted border border-border px-5 py-3 rounded-md hover:text-text hover:border-white/15 transition-colors"
+              className="rounded-md border border-border px-5 py-3 text-xs font-medium text-muted transition-colors hover:border-white/15 hover:text-text"
             >
               Go Back
             </button>
@@ -502,7 +474,7 @@ export default function VideoGenerationPage() {
               type="button"
               onClick={handleGenerate}
               disabled={!selectedTemplateId || limitReached}
-              className="inline-flex items-center gap-2 bg-accent text-bg text-sm font-bold tracking-wider uppercase px-8 py-3.5 rounded-md hover:shadow-accent-glow hover:-translate-y-0.5 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0 disabled:hover:shadow-none"
+              className="inline-flex items-center gap-2 rounded-md bg-accent px-8 py-3.5 text-sm font-bold uppercase tracking-wider text-bg transition-all duration-200 hover:-translate-y-0.5 hover:shadow-accent-glow disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-y-0 disabled:hover:shadow-none"
             >
               <Sparkles size={16} /> Generate Video
             </button>
@@ -513,7 +485,7 @@ export default function VideoGenerationPage() {
       {phase === 'generating' && generation && (
         <section className="space-y-5">
           <div>
-            <h2 className="text-sm font-semibold uppercase tracking-wider text-text mb-1">
+            <h2 className="mb-1 text-sm font-semibold uppercase tracking-wider text-text">
               03 · Generating
             </h2>
             <p className="text-xs text-muted">
@@ -532,7 +504,7 @@ export default function VideoGenerationPage() {
       {phase === 'preview' && generation && selectedMascot && (
         <section className="space-y-5">
           <div>
-            <h2 className="text-sm font-semibold uppercase tracking-wider text-text mb-1">
+            <h2 className="mb-1 text-sm font-semibold uppercase tracking-wider text-text">
               04 · Preview
             </h2>
             <p className="text-xs text-muted">
@@ -542,16 +514,11 @@ export default function VideoGenerationPage() {
             </p>
           </div>
 
-          {(generation.finalVideoUrl || generation.pixverseCdnUrl) ? (
+          {generation.finalVideoUrl || generation.pixverseCdnUrl ? (
             <VideoPlayer
-              videoUrl={
-                (generation.finalVideoUrl || generation.pixverseCdnUrl) as string
-              }
+              videoUrl={(generation.finalVideoUrl || generation.pixverseCdnUrl) as string}
               thumbnailUrl={selectedMascot.chosenImageUrl}
-              templateName={
-                templates.find((t) => t.id === selectedTemplateId)?.name ??
-                'Video'
-              }
+              templateName={templates.find((t) => t.id === selectedTemplateId)?.name ?? 'Video'}
               mascotName={selectedMascot.name}
               duration={generation.duration}
               liked={feedback}
@@ -563,10 +530,9 @@ export default function VideoGenerationPage() {
               onLike={handleLike}
             />
           ) : (
-            <div className="bg-surface border border-border rounded-xl p-10 text-center">
+            <div className="rounded-xl border border-border bg-surface p-10 text-center">
               <p className="text-sm text-muted">
-                {generation.errorMessage ??
-                  'No video was produced. Please try again.'}
+                {generation.errorMessage ?? 'No video was produced. Please try again.'}
               </p>
             </div>
           )}
@@ -580,14 +546,14 @@ export default function VideoGenerationPage() {
                 setFeedback(null)
                 setSavedToFirestore(false)
               }}
-              className="text-xs font-medium text-muted border border-border px-5 py-3 rounded-md hover:text-text hover:border-white/15 transition-colors"
+              className="rounded-md border border-border px-5 py-3 text-xs font-medium text-muted transition-colors hover:border-white/15 hover:text-text"
             >
               Generate Another
             </button>
             {savedToFirestore && (
               <Link
                 href="/dashboard/creation"
-                className="inline-flex items-center gap-2 bg-accent text-bg text-sm font-bold tracking-wider uppercase px-6 py-3 rounded-md hover:shadow-accent-glow transition-all"
+                className="inline-flex items-center gap-2 rounded-md bg-accent px-6 py-3 text-sm font-bold uppercase tracking-wider text-bg transition-all hover:shadow-accent-glow"
               >
                 Back to Gallery
               </Link>
@@ -610,7 +576,7 @@ function PhaseIndicator({ phase }: { phase: Phase }) {
   const activeIndex = steps.findIndex((s) => s.id === phase)
 
   return (
-    <div className="flex items-center gap-3 flex-wrap">
+    <div className="flex flex-wrap items-center gap-3">
       {steps.map((step, idx) => {
         const isActive = idx === activeIndex
         const isDone = idx < activeIndex
@@ -618,12 +584,12 @@ function PhaseIndicator({ phase }: { phase: Phase }) {
           <div key={step.id} className="flex items-center gap-3">
             <div
               className={[
-                'px-3 py-1.5 rounded-full text-xs font-semibold tracking-wider uppercase border transition-colors',
+                'rounded-full border px-3 py-1.5 text-xs font-semibold uppercase tracking-wider transition-colors',
                 isActive
-                  ? 'bg-accent text-bg border-accent'
+                  ? 'border-accent bg-accent text-bg'
                   : isDone
-                    ? 'bg-accent/10 text-accent border-accent/30'
-                    : 'bg-surface text-muted border-border',
+                    ? 'border-accent/30 bg-accent/10 text-accent'
+                    : 'border-border bg-surface text-muted',
               ].join(' ')}
             >
               {step.label}
@@ -649,7 +615,7 @@ function PhaseIndicator({ phase }: { phase: Phase }) {
  */
 async function consumeSseStream(
   body: ReadableStream<Uint8Array>,
-  onEvent: (event: VideoProgressEvent) => Promise<void>,
+  onEvent: (event: VideoProgressEvent) => Promise<void>
 ): Promise<void> {
   const reader = body.getReader()
   const decoder = new TextDecoder()

@@ -3,11 +3,7 @@ jest.mock('child_process', () => ({
 }))
 
 import { execFile } from 'child_process'
-import {
-  generateImages,
-  generateCharacterSheet,
-  PixVerseError,
-} from '@/lib/pixverse'
+import { generateImages, generateCharacterSheet, PixVerseError } from '@/lib/pixverse'
 
 const mockExecFile = execFile as unknown as jest.Mock
 
@@ -16,19 +12,15 @@ beforeEach(() => {
 })
 
 function mockCliSuccess(result: Record<string, unknown>) {
-  mockExecFile.mockImplementation(
-    (_cmd: string, _args: string[], _opts: unknown, cb: Function) => {
-      cb(null, JSON.stringify(result), '')
-    },
-  )
+  mockExecFile.mockImplementation((_cmd: string, _args: string[], _opts: unknown, cb: Function) => {
+    cb(null, JSON.stringify(result), '')
+  })
 }
 
 function mockCliFailure(message: string) {
-  mockExecFile.mockImplementation(
-    (_cmd: string, _args: string[], _opts: unknown, cb: Function) => {
-      cb(new Error(message), '', message)
-    },
-  )
+  mockExecFile.mockImplementation((_cmd: string, _args: string[], _opts: unknown, cb: Function) => {
+    cb(new Error(message), '', message)
+  })
 }
 
 describe('generateImages', () => {
@@ -46,9 +38,9 @@ describe('generateImages', () => {
             prompt: 'test prompt',
             model: 'qwen-image',
           }),
-          '',
+          ''
         )
-      },
+      }
     )
 
     const result = await generateImages('test prompt', 3)
@@ -72,7 +64,7 @@ describe('generateImages', () => {
     mockExecFile.mockImplementation(
       (_cmd: string, _args: string[], _opts: unknown, cb: Function) => {
         cb(null, 'not json', '')
-      },
+      }
     )
 
     await expect(generateImages('test', 1)).rejects.toThrow(/parse/)
@@ -89,10 +81,11 @@ describe('generateCharacterSheet', () => {
       model: 'gpt-image-2.0',
     })
 
-    const result = await generateCharacterSheet(
-      'https://example.com/mascot.png',
-      { mascotName: 'Foxy', gender: 'female', description: 'Friendly fox' },
-    )
+    const result = await generateCharacterSheet('https://example.com/mascot.png', {
+      mascotName: 'Foxy',
+      gender: 'female',
+      description: 'Friendly fox',
+    })
 
     expect(result.imageId).toBe(999)
     expect(result.url).toBe('https://media.pixverse.ai/sheet.jpg')
@@ -119,15 +112,15 @@ describe('generateCharacterSheet', () => {
             prompt: 'test',
             model,
           }),
-          '',
+          ''
         )
-      },
+      }
     )
 
-    const result = await generateCharacterSheet(
-      'https://example.com/mascot.png',
-      { mascotName: 'Foxy', gender: 'female' },
-    )
+    const result = await generateCharacterSheet('https://example.com/mascot.png', {
+      mascotName: 'Foxy',
+      gender: 'female',
+    })
 
     expect(modelsUsed).toContain('gpt-image-2.0')
     expect(modelsUsed).toContain('gemini-3.1-flash')
@@ -140,7 +133,7 @@ describe('generateCharacterSheet', () => {
     await expect(
       generateCharacterSheet('https://example.com/mascot.png', {
         gender: 'male',
-      }),
+      })
     ).rejects.toThrow()
   })
 })

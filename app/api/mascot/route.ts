@@ -28,7 +28,7 @@ export async function POST(req: NextRequest) {
     if (!parsed.success) {
       return NextResponse.json(
         { error: 'Validation failed', details: parsed.error.flatten().fieldErrors },
-        { status: 400 },
+        { status: 400 }
       )
     }
 
@@ -39,10 +39,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ variations })
   } catch (err) {
     console.error('[POST /api/mascot]', err)
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 },
-    )
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }
 
@@ -54,7 +51,7 @@ export async function PATCH(req: NextRequest) {
     if (!parsed.success) {
       return NextResponse.json(
         { error: 'Validation failed', details: parsed.error.flatten().fieldErrors },
-        { status: 400 },
+        { status: 400 }
       )
     }
 
@@ -72,9 +69,6 @@ export async function PATCH(req: NextRequest) {
     })
   } catch (err) {
     console.error('[PATCH /api/mascot]', err)
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 },
-    )
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

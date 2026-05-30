@@ -22,7 +22,7 @@ export async function POST(req: NextRequest) {
     if (!parsed.success) {
       return NextResponse.json(
         { error: 'Validation failed', details: parsed.error.flatten().fieldErrors },
-        { status: 400 },
+        { status: 400 }
       )
     }
 
@@ -37,15 +37,13 @@ export async function POST(req: NextRequest) {
           code: 'limit_reached',
           message: `You've reached your free plan limit of ${mascotLimit} mascot${mascotLimit === 1 ? '' : 's'}. Delete an existing mascot first.`,
         },
-        { status: 402 },
+        { status: 402 }
       )
     }
 
     const scraped = await fetchAndParse(url)
 
-    const pdfUrls = (assetStorageUrls ?? []).filter((u) =>
-      u.toLowerCase().endsWith('.pdf'),
-    )
+    const pdfUrls = (assetStorageUrls ?? []).filter((u) => u.toLowerCase().endsWith('.pdf'))
     const pdfTexts = await Promise.all(pdfUrls.map(extractPdfText))
 
     const { meta, brandbook } = await analyzeBrand(scraped, pdfTexts, url)
@@ -68,9 +66,6 @@ export async function POST(req: NextRequest) {
     })
   } catch (err) {
     console.error('[POST /api/scrape]', err)
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 },
-    )
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

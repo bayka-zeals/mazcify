@@ -29,24 +29,24 @@ export default function MascotVariations({
 
   return (
     <div className="space-y-6">
-      <div className="bg-surface border border-border rounded-xl p-6 sm:p-8">
-        <div className="flex items-baseline justify-between mb-6 gap-4 flex-wrap">
+      <div className="rounded-xl border border-border bg-surface p-6 sm:p-8">
+        <div className="mb-6 flex flex-wrap items-baseline justify-between gap-4">
           <div>
             <h3 className="text-sm font-semibold uppercase tracking-wider text-text">
               Pick Your Mascot
             </h3>
-            <p className="text-xs text-muted mt-1">
+            <p className="mt-1 text-xs text-muted">
               Choose the variation that best matches your brand.
             </p>
           </div>
           {selectedId && (
-            <span className="text-xs text-accent bg-accent/10 border border-accent/20 px-2.5 py-1 rounded-full font-medium">
+            <span className="rounded-full border border-accent/20 bg-accent/10 px-2.5 py-1 text-xs font-medium text-accent">
               Selected
             </span>
           )}
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
           {isLoading
             ? [0, 1, 2].map((i) => <SkeletonCard key={i} />)
             : variations.map((v) => (
@@ -61,13 +61,13 @@ export default function MascotVariations({
         </div>
       </div>
 
-      <div className="flex items-center justify-between gap-4 flex-wrap">
+      <div className="flex flex-wrap items-center justify-between gap-4">
         <div className="flex items-center gap-3">
           <button
             type="button"
             onClick={onBack}
             disabled={loading}
-            className="text-xs font-medium text-muted border border-border px-5 py-3 rounded-md hover:text-text hover:border-white/15 transition-colors disabled:opacity-50"
+            className="rounded-md border border-border px-5 py-3 text-xs font-medium text-muted transition-colors hover:border-white/15 hover:text-text disabled:opacity-50"
           >
             Go Back
           </button>
@@ -75,7 +75,7 @@ export default function MascotVariations({
             type="button"
             onClick={onRegenerate}
             disabled={loading}
-            className="inline-flex items-center gap-2 text-xs font-medium text-muted border border-border px-5 py-3 rounded-md hover:text-text hover:border-white/15 transition-colors disabled:opacity-50"
+            className="inline-flex items-center gap-2 rounded-md border border-border px-5 py-3 text-xs font-medium text-muted transition-colors hover:border-white/15 hover:text-text disabled:opacity-50"
           >
             <RefreshCw size={14} /> Regenerate
           </button>
@@ -85,7 +85,7 @@ export default function MascotVariations({
           type="button"
           disabled={!selected || loading}
           onClick={() => selected && onConfirm(selected)}
-          className="inline-flex items-center gap-2 bg-accent text-bg text-sm font-bold tracking-wider uppercase px-8 py-3.5 rounded-md hover:shadow-accent-glow hover:-translate-y-0.5 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0 disabled:hover:shadow-none"
+          className="inline-flex items-center gap-2 rounded-md bg-accent px-8 py-3.5 text-sm font-bold uppercase tracking-wider text-bg transition-all duration-200 hover:-translate-y-0.5 hover:shadow-accent-glow disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-y-0 disabled:hover:shadow-none"
         >
           {loading ? (
             <GenerationProgress messages={SHEET_GENERATION_MESSAGES} variant="inline" />
@@ -115,9 +115,9 @@ function VariationCard({
       onClick={onClick}
       disabled={disabled}
       className={[
-        'group relative aspect-square rounded-xl overflow-hidden border-2 bg-surface2 transition-all',
+        'group relative aspect-square overflow-hidden rounded-xl border-2 bg-surface2 transition-all',
         selected
-          ? 'border-accent ring-2 ring-accent/40 shadow-accent-glow'
+          ? 'border-accent shadow-accent-glow ring-2 ring-accent/40'
           : 'border-border hover:border-accent/40',
         disabled ? 'pointer-events-none' : '',
       ].join(' ')}
@@ -141,7 +141,7 @@ function VariationCard({
       >
         <span
           className={[
-            'text-xs font-bold uppercase tracking-wider px-2.5 py-1 rounded-md',
+            'rounded-md px-2.5 py-1 text-xs font-bold uppercase tracking-wider',
             selected ? 'bg-accent text-bg' : 'bg-bg/80 text-text',
           ].join(' ')}
         >
@@ -150,7 +150,7 @@ function VariationCard({
       </div>
 
       {selected && (
-        <div className="absolute top-3 right-3 w-7 h-7 rounded-full bg-accent flex items-center justify-center text-bg">
+        <div className="absolute right-3 top-3 flex h-7 w-7 items-center justify-center rounded-full bg-accent text-bg">
           <Check size={16} strokeWidth={3} />
         </div>
       )}
@@ -160,9 +160,9 @@ function VariationCard({
 
 function SkeletonCard() {
   return (
-    <div className="aspect-square rounded-xl border border-border bg-surface2 flex items-center justify-center overflow-hidden relative">
-      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent animate-shimmer" />
-      <Loader2 size={22} className="animate-spin text-muted relative z-10" />
+    <div className="relative flex aspect-square items-center justify-center overflow-hidden rounded-xl border border-border bg-surface2">
+      <div className="animate-shimmer absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent" />
+      <Loader2 size={22} className="relative z-10 animate-spin text-muted" />
     </div>
   )
 }

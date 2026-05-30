@@ -7,7 +7,7 @@ const VIDEO_TIMEOUT_MS = 600_000 // 10 minutes per CLI invocation
 export class PixVerseError extends Error {
   constructor(
     message: string,
-    public statusCode?: number,
+    public statusCode?: number
   ) {
     super(message)
     this.name = 'PixVerseError'
@@ -32,14 +32,15 @@ function runPixverse(args: string[], timeoutMs = 300_000): Promise<string> {
         if (err) {
           const msg = stderr?.trim() || err.message
           // surface CLI exit code when available (e.g. 4 = insufficient credits)
-          const code = typeof (err as NodeJS.ErrnoException).code === 'number'
-            ? ((err as NodeJS.ErrnoException).code as unknown as number)
-            : undefined
+          const code =
+            typeof (err as NodeJS.ErrnoException).code === 'number'
+              ? ((err as NodeJS.ErrnoException).code as unknown as number)
+              : undefined
           reject(new PixVerseError(`pixverse CLI failed: ${msg}`, code))
           return
         }
         resolve(stdout)
-      },
+      }
     )
   })
 }
@@ -53,21 +54,25 @@ async function runPixverseJson<T>(args: string[], timeoutMs = 300_000): Promise<
   }
 }
 
-async function generateSingleImage(
-  prompt: string,
-  maxRetries = 2,
-): Promise<CliImageResult> {
+async function generateSingleImage(prompt: string, maxRetries = 2): Promise<CliImageResult> {
   let lastError: Error | null = null
   for (let attempt = 0; attempt <= maxRetries; attempt++) {
     try {
       return await runPixverseJson<CliImageResult>([
-        'create', 'image',
-        '--prompt', prompt,
-        '--model', 'gpt-image-2.0',
-        '--quality', '1440p',
-        '--aspect-ratio', '1:1',
-        '--detail-level', 'high',
-        '--timeout', '240',
+        'create',
+        'image',
+        '--prompt',
+        prompt,
+        '--model',
+        'gpt-image-2.0',
+        '--quality',
+        '1440p',
+        '--aspect-ratio',
+        '1:1',
+        '--detail-level',
+        'high',
+        '--timeout',
+        '240',
       ])
     } catch (err) {
       lastError = err as Error
@@ -77,12 +82,9 @@ async function generateSingleImage(
   throw lastError!
 }
 
-export async function generateImages(
-  prompt: string,
-  count: number,
-): Promise<MascotVariation[]> {
+export async function generateImages(prompt: string, count: number): Promise<MascotVariation[]> {
   const settled = await Promise.allSettled(
-    Array.from({ length: count }, () => generateSingleImage(prompt)),
+    Array.from({ length: count }, () => generateSingleImage(prompt))
   )
 
   const results: MascotVariation[] = []
@@ -106,7 +108,7 @@ export async function generateImages(
 
 export async function generateCharacterSheet(
   chosenImageUrl: string,
-  params: { mascotName?: string; gender: string; description?: string },
+  params: { mascotName?: string; gender: string; description?: string }
 ): Promise<{ imageId: number; url: string }> {
   const charAnchor = params.mascotName
     ? `${params.mascotName} — a ${params.gender} brand mascot character`
@@ -150,13 +152,20 @@ export async function generateCharacterSheet(
   for (const model of FALLBACK_MODELS) {
     try {
       const args = [
-        'create', 'image',
-        '--prompt', prompt,
-        '--image', chosenImageUrl,
-        '--model', model,
-        '--quality', model === 'gpt-image-2.0' ? '1440p' : '1440p',
-        '--aspect-ratio', '16:9',
-        '--timeout', '240',
+        'create',
+        'image',
+        '--prompt',
+        prompt,
+        '--image',
+        chosenImageUrl,
+        '--model',
+        model,
+        '--quality',
+        model === 'gpt-image-2.0' ? '1440p' : '1440p',
+        '--aspect-ratio',
+        '16:9',
+        '--timeout',
+        '240',
       ]
       if (model === 'gpt-image-2.0') {
         args.push('--detail-level', 'high')
@@ -204,17 +213,17 @@ export interface VideoClipResult {
 }
 
 export interface VideoReferenceOptions {
-  model?: string         // default 'pixverse-c1'
-  quality?: string       // default '1080p'
-  aspectRatio?: string   // default '16:9'
-  duration?: number      // default 5
+  model?: string // default 'pixverse-c1'
+  quality?: string // default '1080p'
+  aspectRatio?: string // default '16:9'
+  duration?: number // default 5
   cliTimeoutSecs?: number
 }
 
 export interface VideoExtendOptions {
-  model?: string         // default 'v6' (extend supports v6, v5.6, grok-imagine)
-  quality?: string       // default '1080p'
-  duration?: number      // default 5 (extend supports 4, 5, 8, 10)
+  model?: string // default 'v6' (extend supports v6, v5.6, grok-imagine)
+  quality?: string // default '1080p'
+  duration?: number // default 5 (extend supports 4, 5, 8, 10)
   cliTimeoutSecs?: number
 }
 
@@ -225,7 +234,7 @@ export interface VideoExtendOptions {
 export async function generateVideoFromReference(
   imageUrl: string,
   prompt: string,
-  options: VideoReferenceOptions = {},
+  options: VideoReferenceOptions = {}
 ): Promise<VideoClipResult> {
   const model = options.model ?? 'pixverse-c1'
   const quality = options.quality ?? '1080p'
@@ -234,22 +243,28 @@ export async function generateVideoFromReference(
   const cliTimeout = options.cliTimeoutSecs ?? 300
 
   const args = [
-    'create', 'reference',
-    '--images', imageUrl,
-    '--prompt', prompt,
-    '--model', model,
-    '--quality', quality,
-    '--aspect-ratio', aspectRatio,
-    '--duration', String(duration),
-    '--timeout', String(cliTimeout),
+    'create',
+    'reference',
+    '--images',
+    imageUrl,
+    '--prompt',
+    prompt,
+    '--model',
+    model,
+    '--quality',
+    quality,
+    '--aspect-ratio',
+    aspectRatio,
+    '--duration',
+    String(duration),
+    '--timeout',
+    String(cliTimeout),
   ]
 
   const result = await runPixverseJson<CliVideoResult>(args, VIDEO_TIMEOUT_MS)
 
   if (result.status !== 'completed' || !result.video_url) {
-    throw new PixVerseError(
-      `Reference clip generation failed: status=${result.status}`,
-    )
+    throw new PixVerseError(`Reference clip generation failed: status=${result.status}`)
   }
 
   return {
@@ -268,7 +283,7 @@ export async function generateVideoFromReference(
 export async function extendVideo(
   videoId: string,
   prompt: string,
-  options: VideoExtendOptions = {},
+  options: VideoExtendOptions = {}
 ): Promise<VideoClipResult> {
   const model = options.model ?? 'v6'
   const quality = options.quality ?? '1080p'
@@ -276,21 +291,26 @@ export async function extendVideo(
   const cliTimeout = options.cliTimeoutSecs ?? 300
 
   const args = [
-    'create', 'extend',
-    '--video', videoId,
-    '--prompt', prompt,
-    '--model', model,
-    '--quality', quality,
-    '--duration', String(duration),
-    '--timeout', String(cliTimeout),
+    'create',
+    'extend',
+    '--video',
+    videoId,
+    '--prompt',
+    prompt,
+    '--model',
+    model,
+    '--quality',
+    quality,
+    '--duration',
+    String(duration),
+    '--timeout',
+    String(cliTimeout),
   ]
 
   const result = await runPixverseJson<CliVideoResult>(args, VIDEO_TIMEOUT_MS)
 
   if (result.status !== 'completed' || !result.video_url) {
-    throw new PixVerseError(
-      `Extend clip generation failed: status=${result.status}`,
-    )
+    throw new PixVerseError(`Extend clip generation failed: status=${result.status}`)
   }
 
   return {
@@ -306,14 +326,15 @@ export async function extendVideo(
  * Download a generated video to a local destination directory.
  * Returns the absolute path to the downloaded file.
  */
-export async function downloadVideo(
-  videoId: string,
-  destDir: string,
-): Promise<string> {
+export async function downloadVideo(videoId: string, destDir: string): Promise<string> {
   const result = await runPixverseJson<CliDownloadResult>([
-    'asset', 'download', videoId,
-    '--type', 'video',
-    '--dest', destDir,
+    'asset',
+    'download',
+    videoId,
+    '--type',
+    'video',
+    '--dest',
+    destDir,
   ])
 
   if (!result.file) {
@@ -329,7 +350,7 @@ export async function downloadVideo(
  */
 export async function generateVideoClip(
   mascotImageUrl: string,
-  clip: PromptClip,
+  clip: PromptClip
 ): Promise<VideoClipResult> {
   const result = await generateVideoFromReference(mascotImageUrl, clip.prompt, {
     duration: clip.duration ?? 5,
@@ -351,7 +372,7 @@ export async function generateStoryVideo(
     aspectRatio?: string
     onClipStart?: (clipIndex: number, totalClips: number) => void
     onClipDone?: (result: VideoClipResult) => void
-  } = {},
+  } = {}
 ): Promise<VideoClipResult[]> {
   const sorted = [...clips].sort((a, b) => a.clipIndex - b.clipIndex)
   const results: VideoClipResult[] = []

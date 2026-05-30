@@ -41,20 +41,16 @@ export default function DashboardHome() {
   const mascotLimit = PLAN_LIMITS.free.mascotsMax
   const videoLimit = PLAN_LIMITS.free.videosMax
 
-  const mascotValue = admin
-    ? `${mascotsCount} / ∞`
-    : `${mascotsCount} / ${mascotLimit}`
-  const videoValue = admin
-    ? `${videosCount} / ∞`
-    : `${videosCount} / ${videoLimit}`
+  const mascotValue = admin ? `${mascotsCount} / ∞` : `${mascotsCount} / ${mascotLimit}`
+  const videoValue = admin ? `${videosCount} / ∞` : `${videosCount} / ${videoLimit}`
   const planSubValue = admin ? 'Admin · Unlimited' : 'Free plan limit'
 
   return (
-    <div className="max-w-5xl mx-auto">
+    <div className="mx-auto max-w-5xl">
       <WelcomeBanner />
 
       {/* Stats grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-10">
+      <div className="mb-10 grid grid-cols-1 gap-4 sm:grid-cols-3">
         <StatsCard
           icon="🎭"
           title="Mascots Created"
@@ -80,14 +76,16 @@ export default function DashboardHome() {
       </div>
 
       {/* Quick action */}
-      <div className="bg-surface border border-border rounded-xl p-8 flex flex-col sm:flex-row items-center justify-between gap-6">
+      <div className="flex flex-col items-center justify-between gap-6 rounded-xl border border-border bg-surface p-8 sm:flex-row">
         <div>
-          <h3 className="text-base font-semibold text-text mb-1">Ready to build your mascot?</h3>
-          <p className="text-sm text-muted">Start with your website URL and we&apos;ll handle the rest.</p>
+          <h3 className="mb-1 text-base font-semibold text-text">Ready to build your mascot?</h3>
+          <p className="text-sm text-muted">
+            Start with your website URL and we&apos;ll handle the rest.
+          </p>
         </div>
         <a
           href="/dashboard/creation"
-          className="shrink-0 bg-accent text-bg text-sm font-bold tracking-wider uppercase px-8 py-3.5 rounded-md hover:shadow-accent-glow hover:-translate-y-0.5 transition-all duration-200 whitespace-nowrap"
+          className="shrink-0 whitespace-nowrap rounded-md bg-accent px-8 py-3.5 text-sm font-bold uppercase tracking-wider text-bg transition-all duration-200 hover:-translate-y-0.5 hover:shadow-accent-glow"
         >
           + Create Mascot
         </a>

@@ -32,9 +32,7 @@ beforeEach(() => {
 
 describe('POST /api/scrape', () => {
   it('returns 400 when url is missing', async () => {
-    const res = await POST(
-      makeRequest({ userId: 'u1', gender: 'male', currentMascotCount: 0 }),
-    )
+    const res = await POST(makeRequest({ userId: 'u1', gender: 'male', currentMascotCount: 0 }))
     expect(res.status).toBe(400)
   })
 
@@ -45,7 +43,7 @@ describe('POST /api/scrape', () => {
         url: 'https://example.com',
         gender: 'male',
         currentMascotCount: 1,
-      }),
+      })
     )
     expect(res.status).toBe(402)
     const body = await res.json()
@@ -79,7 +77,7 @@ describe('POST /api/scrape', () => {
         url: 'https://acme.com',
         gender: 'neutral',
         currentMascotCount: 0,
-      }),
+      })
     )
 
     expect(res.status).toBe(200)
@@ -117,7 +115,7 @@ describe('POST /api/scrape', () => {
         url: 'https://example.com',
         gender: 'female',
         currentMascotCount: 0,
-      }),
+      })
     )
 
     expect(res.status).toBe(200)
@@ -140,7 +138,7 @@ describe('POST /api/scrape', () => {
         url: 'https://example.com',
         gender: 'male',
         currentMascotCount: 0,
-      }),
+      })
     )
 
     expect(res.status).toBe(500)

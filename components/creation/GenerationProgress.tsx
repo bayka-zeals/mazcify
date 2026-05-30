@@ -39,10 +39,8 @@ export default function GenerationProgress({
 
   const currentMsg = messages[msgIndex] || messages[0]
   const progressPercent = Math.min(
-    ((msgIndex * intervalMs + (elapsed % intervalMs)) /
-      (messages.length * intervalMs)) *
-      95,
-    95,
+    ((msgIndex * intervalMs + (elapsed % intervalMs)) / (messages.length * intervalMs)) * 95,
+    95
   )
 
   if (variant === 'inline') {
@@ -55,22 +53,24 @@ export default function GenerationProgress({
   }
 
   return (
-    <div className="flex flex-col items-center gap-5 w-full max-w-sm mx-auto">
+    <div className="mx-auto flex w-full max-w-sm flex-col items-center gap-5">
       <Loader2 size={32} className="animate-spin text-accent" />
 
-      <p className="text-sm text-muted text-center h-5 transition-all duration-500 ease-in-out">
+      <p className="h-5 text-center text-sm text-muted transition-all duration-500 ease-in-out">
         {currentMsg}
       </p>
 
       <div className="w-full space-y-2">
-        <div className="w-full h-1.5 bg-surface2 rounded-full overflow-hidden border border-border">
+        <div className="h-1.5 w-full overflow-hidden rounded-full border border-border bg-surface2">
           <div
-            className="h-full bg-accent rounded-full transition-all duration-500 ease-out"
+            className="h-full rounded-full bg-accent transition-all duration-500 ease-out"
             style={{ width: `${progressPercent}%` }}
           />
         </div>
         <div className="flex justify-between text-[10px] text-muted">
-          <span>Step {msgIndex + 1} of {messages.length}</span>
+          <span>
+            Step {msgIndex + 1} of {messages.length}
+          </span>
           <span>{Math.round(elapsed / 1000)}s</span>
         </div>
       </div>

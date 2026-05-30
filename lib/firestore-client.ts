@@ -10,13 +10,7 @@ import {
 } from 'firebase/firestore'
 import { ref as storageRef, uploadBytes, getDownloadURL } from 'firebase/storage'
 import { db, storage } from '@/lib/firebase'
-import type {
-  BrandMeta,
-  Mascot,
-  Video,
-  VideoFeedback,
-  VideoStatus,
-} from '@/types'
+import type { BrandMeta, Mascot, Video, VideoFeedback, VideoStatus } from '@/types'
 
 export interface SavedMascotCard {
   brandId: string
@@ -65,7 +59,7 @@ export async function getMascots(uid: string): Promise<SavedMascotCard[]> {
         console.error(`Failed to fetch mascots for brand ${brandDoc.id}:`, err)
         return []
       }
-    }),
+    })
   )
 
   return allResults
@@ -76,7 +70,7 @@ export async function getMascots(uid: string): Promise<SavedMascotCard[]> {
 export async function saveBrand(
   uid: string,
   brandId: string,
-  data: Omit<BrandMeta, 'id' | 'updatedAt'> & { brandbook: string },
+  data: Omit<BrandMeta, 'id' | 'updatedAt'> & { brandbook: string }
 ): Promise<void> {
   const ref = doc(db, 'users', uid, 'brands', brandId)
   await setDoc(ref, {
@@ -90,7 +84,7 @@ export async function saveMascot(
   uid: string,
   brandId: string,
   mascotId: string,
-  data: Partial<Mascot>,
+  data: Partial<Mascot>
 ): Promise<void> {
   const ref = doc(db, 'users', uid, 'brands', brandId, 'mascots', mascotId)
   await setDoc(
@@ -100,14 +94,14 @@ export async function saveMascot(
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp(),
     },
-    { merge: true },
+    { merge: true }
   )
 }
 
 export async function savePromptVersion(
   uid: string,
   brandId: string,
-  prompt: string,
+  prompt: string
 ): Promise<string> {
   const colRef = collection(db, 'users', uid, 'brands', brandId, 'prompts')
   const docRef = await addDoc(colRef, {
@@ -123,7 +117,7 @@ export async function updateMascotChosen(
   mascotId: string,
   chosenImageUrl: string,
   characterSheetUrl: string,
-  mascotName?: string,
+  mascotName?: string
 ): Promise<void> {
   const ref = doc(db, 'users', uid, 'brands', brandId, 'mascots', mascotId)
   await updateDoc(ref, {
@@ -141,7 +135,7 @@ export async function updateMascotChosen(
 export async function saveUploadedMascot(
   uid: string,
   name: string,
-  imageUrl: string,
+  imageUrl: string
 ): Promise<{ brandId: string; mascotId: string }> {
   const brandId = crypto.randomUUID()
   const mascotId = crypto.randomUUID()
@@ -195,7 +189,7 @@ export interface SavedVideoCard {
 function videoDocToCard(
   brandId: string,
   videoId: string,
-  d: Record<string, unknown>,
+  d: Record<string, unknown>
 ): SavedVideoCard {
   const createdAtIso =
     (d.createdAt as { toDate?: () => Date } | undefined)?.toDate?.()?.toISOString?.() ||
@@ -209,7 +203,7 @@ function videoDocToCard(
     mascotImageUrl: (d.mascotImageUrl as string) || '',
     templateId: (d.templateId as string) || '',
     templateName: (d.templateName as string) || 'Story',
-    status: ((d.status as VideoStatus) || 'pending'),
+    status: (d.status as VideoStatus) || 'pending',
     currentClip: typeof d.currentClip === 'number' ? d.currentClip : 0,
     totalClips: typeof d.totalClips === 'number' ? d.totalClips : 6,
     finalVideoUrl: (d.finalVideoUrl as string) ?? null,
@@ -235,7 +229,7 @@ export async function createVideoDoc(
     templateId: string
     templateName: string
     totalClips: number
-  },
+  }
 ): Promise<string> {
   const videoId = crypto.randomUUID()
   const ref = doc(db, 'users', uid, 'brands', data.brandId, 'videos', videoId)
@@ -270,7 +264,7 @@ export async function updateVideoProgress(
   uid: string,
   brandId: string,
   videoId: string,
-  data: Partial<Pick<Video, 'status' | 'currentClip' | 'clipVideoIds'>>,
+  data: Partial<Pick<Video, 'status' | 'currentClip' | 'clipVideoIds'>>
 ): Promise<void> {
   const ref = doc(db, 'users', uid, 'brands', brandId, 'videos', videoId)
   await updateDoc(ref, {
@@ -291,7 +285,7 @@ export async function finalizeVideo(
     clipVideoIds: string[]
     partial?: boolean
     errorMessage?: string
-  },
+  }
 ): Promise<void> {
   const ref = doc(db, 'users', uid, 'brands', brandId, 'videos', videoId)
   await updateDoc(ref, {
@@ -311,7 +305,7 @@ export async function failVideo(
   uid: string,
   brandId: string,
   videoId: string,
-  errorMessage: string,
+  errorMessage: string
 ): Promise<void> {
   const ref = doc(db, 'users', uid, 'brands', brandId, 'videos', videoId)
   await updateDoc(ref, {
@@ -325,7 +319,7 @@ export async function setVideoFeedback(
   uid: string,
   brandId: string,
   videoId: string,
-  liked: VideoFeedback,
+  liked: VideoFeedback
 ): Promise<void> {
   const ref = doc(db, 'users', uid, 'brands', brandId, 'videos', videoId)
   await updateDoc(ref, {
@@ -337,7 +331,7 @@ export async function setVideoFeedback(
 export async function softDeleteVideo(
   uid: string,
   brandId: string,
-  videoId: string,
+  videoId: string
 ): Promise<void> {
   const ref = doc(db, 'users', uid, 'brands', brandId, 'videos', videoId)
   await updateDoc(ref, {
@@ -371,7 +365,7 @@ export async function getVideos(uid: string): Promise<SavedVideoCard[]> {
         console.error(`Failed to fetch videos for brand ${brandDoc.id}:`, err)
         return []
       }
-    }),
+    })
   )
 
   return allResults
@@ -382,7 +376,7 @@ export async function getVideos(uid: string): Promise<SavedVideoCard[]> {
 export async function getVideoById(
   uid: string,
   brandId: string,
-  videoId: string,
+  videoId: string
 ): Promise<SavedVideoCard | null> {
   const ref = doc(db, 'users', uid, 'brands', brandId, 'videos', videoId)
   const snap = await getDoc(ref)
@@ -414,7 +408,7 @@ export async function saveUploadedVideo(
     name?: string
     duration?: number
     thumbnailUrl?: string | null
-  },
+  }
 ): Promise<string> {
   const videoId = crypto.randomUUID()
   const ref = doc(db, 'users', uid, 'brands', mascot.brandId, 'videos', videoId)
@@ -434,9 +428,10 @@ export async function saveUploadedVideo(
     finalVideoUrl: data.videoUrl,
     pixverseCdnUrl: null,
     thumbnailUrl: data.thumbnailUrl ?? null,
-    duration: typeof data.duration === 'number' && Number.isFinite(data.duration)
-      ? Math.round(data.duration)
-      : 0,
+    duration:
+      typeof data.duration === 'number' && Number.isFinite(data.duration)
+        ? Math.round(data.duration)
+        : 0,
     liked: null,
     deleted: false,
     partial: false,
@@ -456,7 +451,7 @@ export async function saveUploadedVideo(
 export async function uploadVideoBackup(
   uid: string,
   videoId: string,
-  sourceUrl: string,
+  sourceUrl: string
 ): Promise<string> {
   const res = await fetch(sourceUrl)
   if (!res.ok) {
@@ -468,4 +463,3 @@ export async function uploadVideoBackup(
   await uploadBytes(ref, blob, { contentType: blob.type || 'video/mp4' })
   return await getDownloadURL(ref)
 }
-

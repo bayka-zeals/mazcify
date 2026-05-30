@@ -7,17 +7,11 @@ export const metadata: Metadata = {
   description: 'AI-powered brand mascot creator and video generator for your business.',
 }
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
       <body>
-        <AuthProvider>
-          {children}
-        </AuthProvider>
+        <AuthProvider>{children}</AuthProvider>
       </body>
     </html>
   )

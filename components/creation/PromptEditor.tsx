@@ -72,31 +72,31 @@ export default function PromptEditor({
   return (
     <div className="space-y-6">
       {/* Brandbook summary (collapsible) */}
-      <div className="bg-surface border border-border rounded-xl overflow-hidden">
+      <div className="overflow-hidden rounded-xl border border-border bg-surface">
         <button
           type="button"
           onClick={() => setOpen((v) => !v)}
-          className="w-full flex items-center justify-between px-6 py-4 hover:bg-surface2 transition-colors"
+          className="flex w-full items-center justify-between px-6 py-4 transition-colors hover:bg-surface2"
         >
           <div className="text-left">
-            <p className="text-xs font-semibold uppercase tracking-wider text-muted mb-1">
+            <p className="mb-1 text-xs font-semibold uppercase tracking-wider text-muted">
               Brand Summary
             </p>
-            <p className="text-sm text-text font-medium truncate">
+            <p className="truncate text-sm font-medium text-text">
               {meta.companyName || 'Unknown company'}
             </p>
           </div>
           {open ? (
-            <ChevronUp size={18} className="text-muted shrink-0" />
+            <ChevronUp size={18} className="shrink-0 text-muted" />
           ) : (
-            <ChevronDown size={18} className="text-muted shrink-0" />
+            <ChevronDown size={18} className="shrink-0 text-muted" />
           )}
         </button>
 
         {open && (
-          <div className="px-6 pb-6 pt-2 border-t border-border space-y-4">
+          <div className="space-y-4 border-t border-border px-6 pb-6 pt-2">
             {/* Meta row */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <MetaItem label="Company" value={meta.companyName} />
               <MetaItem label="Tone" value={meta.tone} />
             </div>
@@ -104,20 +104,20 @@ export default function PromptEditor({
             {/* Colors */}
             {meta.colors?.length > 0 && (
               <div>
-                <p className="text-[11px] font-semibold uppercase tracking-wider text-muted mb-2">
+                <p className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-muted">
                   Palette
                 </p>
                 <div className="flex flex-wrap gap-2">
                   {meta.colors.map((c) => (
                     <div
                       key={c}
-                      className="flex items-center gap-2 bg-surface2 border border-border rounded-md pl-2 pr-3 py-1"
+                      className="flex items-center gap-2 rounded-md border border-border bg-surface2 py-1 pl-2 pr-3"
                     >
                       <span
-                        className="w-3 h-3 rounded-sm border border-white/10"
+                        className="h-3 w-3 rounded-sm border border-white/10"
                         style={{ backgroundColor: c }}
                       />
-                      <span className="text-xs text-text font-mono">{c}</span>
+                      <span className="font-mono text-xs text-text">{c}</span>
                     </div>
                   ))}
                 </div>
@@ -125,9 +125,7 @@ export default function PromptEditor({
             )}
 
             {/* Taglines */}
-            {meta.taglines?.length > 0 && (
-              <ChipRow label="Taglines" items={meta.taglines} />
-            )}
+            {meta.taglines?.length > 0 && <ChipRow label="Taglines" items={meta.taglines} />}
 
             {/* Products */}
             {meta.productNames?.length > 0 && (
@@ -137,10 +135,10 @@ export default function PromptEditor({
             {/* Brandbook excerpt */}
             {brandbook && (
               <div>
-                <p className="text-[11px] font-semibold uppercase tracking-wider text-muted mb-2">
+                <p className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-muted">
                   Brandbook
                 </p>
-                <div className="bg-surface2 border border-border rounded-lg p-4 max-h-48 overflow-auto text-xs text-muted whitespace-pre-wrap leading-relaxed">
+                <div className="max-h-48 overflow-auto whitespace-pre-wrap rounded-lg border border-border bg-surface2 p-4 text-xs leading-relaxed text-muted">
                   {brandbook}
                 </div>
               </div>
@@ -150,12 +148,10 @@ export default function PromptEditor({
       </div>
 
       {/* Editable prompt */}
-      <div className="bg-surface border border-border rounded-xl p-6 sm:p-8 space-y-4">
+      <div className="space-y-4 rounded-xl border border-border bg-surface p-6 sm:p-8">
         <div className="flex items-center gap-2">
           <Sparkles size={16} className="text-accent" />
-          <h3 className="text-sm font-semibold uppercase tracking-wider text-text">
-            Image Prompt
-          </h3>
+          <h3 className="text-sm font-semibold uppercase tracking-wider text-text">Image Prompt</h3>
         </div>
         <p className="text-xs text-muted">
           We crafted this prompt from your brand. Edit it freely before generating.
@@ -165,7 +161,7 @@ export default function PromptEditor({
           value={imagePrompt}
           onChange={(e) => onPromptChange(e.target.value)}
           rows={10}
-          className="w-full bg-surface2 border border-border rounded-lg px-4 py-3 text-sm text-text placeholder:text-muted focus:outline-none focus:border-accent transition-colors resize-y font-mono leading-relaxed"
+          className="w-full resize-y rounded-lg border border-border bg-surface2 px-4 py-3 font-mono text-sm leading-relaxed text-text transition-colors placeholder:text-muted focus:border-accent focus:outline-none"
           placeholder="A friendly cartoon fox mascot…"
         />
 
@@ -175,7 +171,7 @@ export default function PromptEditor({
       </div>
 
       {error && (
-        <div className="bg-red-500/10 border border-red-500/30 text-red-300 rounded-lg px-4 py-3 text-sm">
+        <div className="rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-300">
           {error}
         </div>
       )}
@@ -186,7 +182,7 @@ export default function PromptEditor({
           type="button"
           onClick={onBack}
           disabled={loading}
-          className="text-xs font-medium text-muted border border-border px-5 py-3 rounded-md hover:text-text hover:border-white/15 transition-colors disabled:opacity-50"
+          className="rounded-md border border-border px-5 py-3 text-xs font-medium text-muted transition-colors hover:border-white/15 hover:text-text disabled:opacity-50"
         >
           Go Back
         </button>
@@ -194,7 +190,7 @@ export default function PromptEditor({
           type="button"
           onClick={handleGenerate}
           disabled={loading}
-          className="inline-flex items-center gap-2 bg-accent text-bg text-sm font-bold tracking-wider uppercase px-8 py-3.5 rounded-md hover:shadow-accent-glow hover:-translate-y-0.5 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0 disabled:hover:shadow-none"
+          className="inline-flex items-center gap-2 rounded-md bg-accent px-8 py-3.5 text-sm font-bold uppercase tracking-wider text-bg transition-all duration-200 hover:-translate-y-0.5 hover:shadow-accent-glow disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-y-0 disabled:hover:shadow-none"
         >
           {loading ? (
             <GenerationProgress messages={MASCOT_GENERATION_MESSAGES} variant="inline" />
@@ -211,9 +207,7 @@ function MetaItem({ label, value }: { label: string; value?: string }) {
   if (!value) return null
   return (
     <div>
-      <p className="text-[11px] font-semibold uppercase tracking-wider text-muted mb-1">
-        {label}
-      </p>
+      <p className="mb-1 text-[11px] font-semibold uppercase tracking-wider text-muted">{label}</p>
       <p className="text-sm text-text">{value}</p>
     </div>
   )
@@ -222,14 +216,12 @@ function MetaItem({ label, value }: { label: string; value?: string }) {
 function ChipRow({ label, items }: { label: string; items: string[] }) {
   return (
     <div>
-      <p className="text-[11px] font-semibold uppercase tracking-wider text-muted mb-2">
-        {label}
-      </p>
+      <p className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-muted">{label}</p>
       <div className="flex flex-wrap gap-2">
         {items.map((item) => (
           <span
             key={item}
-            className="text-xs text-text bg-surface2 border border-border rounded-md px-2.5 py-1"
+            className="rounded-md border border-border bg-surface2 px-2.5 py-1 text-xs text-text"
           >
             {item}
           </span>

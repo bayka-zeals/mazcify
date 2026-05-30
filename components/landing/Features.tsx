@@ -25,29 +25,32 @@ const features = [
 
 export default function Features() {
   return (
-    <section id="features" className="max-w-6xl mx-auto px-12 pb-28">
-      <p className="text-accent text-xs font-semibold tracking-[3px] uppercase mb-4">What You Get</p>
+    <section id="features" className="mx-auto max-w-6xl px-12 pb-28">
+      <p className="mb-4 text-xs font-semibold uppercase tracking-[3px] text-accent">
+        What You Get
+      </p>
       <h2
-        className="font-display uppercase leading-none tracking-wide mb-16"
+        className="mb-16 font-display uppercase leading-none tracking-wide"
         style={{ fontSize: 'clamp(40px, 5vw, 72px)' }}
       >
-        Everything your<br />
+        Everything your
+        <br />
         <span className="text-accent">brand needs.</span>
       </h2>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         {features.map((f) => {
           const Icon = f.icon
           return (
             <div
               key={f.title}
-              className="group bg-surface border border-border rounded-xl p-9 hover:bg-surface2 hover:-translate-y-0.5 hover:border-accent/20 transition-all duration-300"
+              className="group rounded-xl border border-border bg-surface p-9 transition-all duration-300 hover:-translate-y-0.5 hover:border-accent/20 hover:bg-surface2"
             >
-              <div className="w-11 h-11 bg-accent/10 border border-accent/20 rounded-xl flex items-center justify-center mb-5">
-                <Icon className="w-5 h-5 text-accent" />
+              <div className="mb-5 flex h-11 w-11 items-center justify-center rounded-xl border border-accent/20 bg-accent/10">
+                <Icon className="h-5 w-5 text-accent" />
               </div>
-              <h3 className="text-base font-semibold text-text mb-2.5">{f.title}</h3>
-              <p className="text-sm text-muted leading-relaxed">{f.desc}</p>
+              <h3 className="mb-2.5 text-base font-semibold text-text">{f.title}</h3>
+              <p className="text-sm leading-relaxed text-muted">{f.desc}</p>
             </div>
           )
         })}

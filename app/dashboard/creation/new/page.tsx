@@ -199,10 +199,10 @@ export default function CreationNewPage() {
         scrape.mascotId,
         chosenVariation.imageUrl,
         characterSheetUrl,
-        formName || undefined,
+        formName || undefined
       )
       const timeout = new Promise<never>((_, reject) =>
-        setTimeout(() => reject(new Error('Save timed out after 30s. Please try again.')), 30_000),
+        setTimeout(() => reject(new Error('Save timed out after 30s. Please try again.')), 30_000)
       )
       await Promise.race([savePromise, timeout])
       router.push('/dashboard/creation')
@@ -215,15 +215,15 @@ export default function CreationNewPage() {
   }
 
   return (
-    <div className="max-w-5xl mx-auto space-y-8">
+    <div className="mx-auto max-w-5xl space-y-8">
       <div>
         <Link
           href="/dashboard/creation"
-          className="inline-flex items-center gap-2 text-xs text-muted hover:text-text transition-colors mb-4"
+          className="mb-4 inline-flex items-center gap-2 text-xs text-muted transition-colors hover:text-text"
         >
           <ArrowLeft size={14} /> Back to Creation
         </Link>
-        <p className="text-accent text-xs font-semibold tracking-[3px] uppercase mb-1">
+        <p className="mb-1 text-xs font-semibold uppercase tracking-[3px] text-accent">
           Step 1 — Image Generation
         </p>
         <h1 className="font-display text-3xl uppercase tracking-wide text-text">
@@ -234,9 +234,9 @@ export default function CreationNewPage() {
       <PhaseIndicator phase={phase} />
 
       <div ref={phaseContentRef} />
-      {phase === 'form' && (
-        limitReached ? (
-          <div className="bg-yellow-500/10 border border-yellow-500/30 text-yellow-200 rounded-xl px-5 py-6 space-y-3">
+      {phase === 'form' &&
+        (limitReached ? (
+          <div className="space-y-3 rounded-xl border border-yellow-500/30 bg-yellow-500/10 px-5 py-6 text-yellow-200">
             <p className="text-sm font-semibold">
               You&apos;ve reached your free plan limit of {mascotLimit} mascot
               {mascotLimit === 1 ? '' : 's'}.
@@ -246,7 +246,7 @@ export default function CreationNewPage() {
             </p>
             <Link
               href="/dashboard/creation"
-              className="inline-flex items-center gap-2 bg-accent text-bg text-xs font-bold tracking-wider uppercase px-5 py-2.5 rounded-md hover:shadow-accent-glow transition-all"
+              className="inline-flex items-center gap-2 rounded-md bg-accent px-5 py-2.5 text-xs font-bold uppercase tracking-wider text-bg transition-all hover:shadow-accent-glow"
             >
               Back to Gallery
             </Link>
@@ -254,11 +254,10 @@ export default function CreationNewPage() {
         ) : mascotCountLoaded ? (
           <Step1Form currentMascotCount={mascotCount} onSuccess={handleScrapeSuccess} />
         ) : (
-          <div className="bg-surface border border-border rounded-xl p-10 text-center">
-            <p className="text-sm text-muted animate-pulse">Checking your plan…</p>
+          <div className="rounded-xl border border-border bg-surface p-10 text-center">
+            <p className="animate-pulse text-sm text-muted">Checking your plan…</p>
           </div>
-        )
-      )}
+        ))}
 
       {phase === 'prompt' && scrape && (
         <PromptEditor
@@ -316,12 +315,12 @@ function PhaseIndicator({ phase }: { phase: Phase }) {
           <div key={step.id} className="flex items-center gap-3">
             <div
               className={[
-                'px-3 py-1.5 rounded-full text-xs font-semibold tracking-wider uppercase border transition-colors',
+                'rounded-full border px-3 py-1.5 text-xs font-semibold uppercase tracking-wider transition-colors',
                 isActive
-                  ? 'bg-accent text-bg border-accent'
+                  ? 'border-accent bg-accent text-bg'
                   : isDone
-                  ? 'bg-accent/10 text-accent border-accent/30'
-                  : 'bg-surface text-muted border-border',
+                    ? 'border-accent/30 bg-accent/10 text-accent'
+                    : 'border-border bg-surface text-muted',
               ].join(' ')}
             >
               {step.label}

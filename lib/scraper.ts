@@ -27,8 +27,7 @@ export async function fetchAndParse(url: string): Promise<ScrapedContent> {
     const res = await fetch(url, {
       signal: controller.signal,
       headers: {
-        'User-Agent':
-          'Mozilla/5.0 (compatible; Mazcify/1.0; +https://mazcify.com)',
+        'User-Agent': 'Mozilla/5.0 (compatible; Mazcify/1.0; +https://mazcify.com)',
       },
     })
     clearTimeout(timeout)
@@ -41,8 +40,7 @@ export async function fetchAndParse(url: string): Promise<ScrapedContent> {
     $('script, style, noscript').remove()
 
     const title = $('title').first().text().trim()
-    const metaDescription =
-      $('meta[name="description"]').attr('content')?.trim() ?? ''
+    const metaDescription = $('meta[name="description"]').attr('content')?.trim() ?? ''
 
     const headings: string[] = []
     $('h1, h2, h3').each((_, el) => {
@@ -50,10 +48,7 @@ export async function fetchAndParse(url: string): Promise<ScrapedContent> {
       if (text) headings.push(text)
     })
 
-    const bodyText = ($('body').text() ?? '')
-      .replace(/\s+/g, ' ')
-      .trim()
-      .slice(0, BODY_TEXT_LIMIT)
+    const bodyText = ($('body').text() ?? '').replace(/\s+/g, ' ').trim().slice(0, BODY_TEXT_LIMIT)
 
     return { title, metaDescription, headings, bodyText }
   } catch {

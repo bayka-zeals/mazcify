@@ -33,11 +33,7 @@ describe('fetchAndParse', () => {
 
     expect(result.title).toBe('Acme Corp')
     expect(result.metaDescription).toBe('We build great stuff')
-    expect(result.headings).toEqual([
-      'Welcome to Acme',
-      'Our Products',
-      'Widget Pro',
-    ])
+    expect(result.headings).toEqual(['Welcome to Acme', 'Our Products', 'Widget Pro'])
     expect(result.bodyText).toContain('Some body text here')
   })
 
