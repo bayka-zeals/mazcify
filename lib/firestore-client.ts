@@ -398,6 +398,58 @@ export async function countActiveVideos(uid: string): Promise<number> {
 }
 
 /**
+ * Save a user-uploaded video (already in Storage) as a 'done' video doc under
+ * the given mascot's brand. The video bypasses the PixVerse generation pipeline.
+ */
+export async function saveUploadedVideo(
+  uid: string,
+  mascot: {
+    brandId: string
+    mascotId: string
+    mascotName: string
+    mascotImageUrl: string
+  },
+  data: {
+    videoUrl: string
+    name?: string
+    duration?: number
+    thumbnailUrl?: string | null
+  },
+): Promise<string> {
+  const videoId = crypto.randomUUID()
+  const ref = doc(db, 'users', uid, 'brands', mascot.brandId, 'videos', videoId)
+
+  const initial: Record<string, unknown> = {
+    id: videoId,
+    brandId: mascot.brandId,
+    mascotId: mascot.mascotId,
+    mascotName: mascot.mascotName,
+    mascotImageUrl: mascot.mascotImageUrl,
+    templateId: 'upload',
+    templateName: data.name?.trim() || 'Uploaded Video',
+    status: 'done' satisfies VideoStatus,
+    currentClip: 1,
+    totalClips: 1,
+    clipVideoIds: [],
+    finalVideoUrl: data.videoUrl,
+    pixverseCdnUrl: null,
+    thumbnailUrl: data.thumbnailUrl ?? null,
+    duration: typeof data.duration === 'number' && Number.isFinite(data.duration)
+      ? Math.round(data.duration)
+      : 0,
+    liked: null,
+    deleted: false,
+    partial: false,
+    source: 'upload',
+    createdAt: serverTimestamp(),
+    updatedAt: serverTimestamp(),
+  }
+
+  await setDoc(ref, initial)
+  return videoId
+}
+
+/**
  * Download a public video URL and upload it to Firebase Storage as a backup.
  * Returns the new download URL.
  */

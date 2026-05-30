@@ -20,11 +20,12 @@ import {
   getMascots,
   getVideos,
   saveUploadedMascot,
+  saveUploadedVideo,
   softDeleteVideo,
   type SavedMascotCard,
   type SavedVideoCard,
 } from '@/lib/firestore-client'
-import { PLAN_LIMITS } from '@/config/constants'
+import { PLAN_LIMITS, isAdmin } from '@/config/constants'
 import VideoCard from '@/components/video/VideoCard'
 
 export default function CreationPage() {
@@ -37,6 +38,7 @@ export default function CreationPage() {
   const [selectedMascot, setSelectedMascot] = useState<SavedMascotCard | null>(null)
   const [selectedVideo, setSelectedVideo] = useState<SavedVideoCard | null>(null)
   const [showUpload, setShowUpload] = useState(false)
+  const [showUploadVideo, setShowUploadVideo] = useState(false)
 
   const fetchMascots = (uid: string) => {
     setError(null)
@@ -83,7 +85,10 @@ export default function CreationPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, authLoading])
 
+  const admin = isAdmin(user?.uid)
   const hasMascot = mascots.length > 0
+  const mascotLimitReached = !admin && mascots.length >= PLAN_LIMITS.free.mascotsMax
+  const videoLimitReached = !admin && videos.length >= PLAN_LIMITS.free.videosMax
   const showLoading = !fetched && authLoading
 
   const handleVideoDelete = async (video: SavedVideoCard) => {
@@ -120,16 +125,27 @@ export default function CreationPage() {
               <button
                 type="button"
                 onClick={() => setShowUpload(true)}
-                className="inline-flex items-center gap-2 text-xs font-medium text-muted border border-border px-4 py-2 rounded-md hover:text-text hover:border-white/15 transition-colors"
+                disabled={mascotLimitReached}
+                title={mascotLimitReached ? 'Mascot limit reached. Delete one first.' : undefined}
+                className="inline-flex items-center gap-2 text-xs font-medium text-muted border border-border px-4 py-2 rounded-md hover:text-text hover:border-white/15 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <Upload size={14} /> Upload
               </button>
-              <a
-                href="/dashboard/creation/new"
-                className="inline-flex items-center gap-2 bg-accent text-bg text-xs font-bold tracking-wider uppercase px-4 py-2 rounded-md hover:shadow-accent-glow transition-all"
-              >
-                Generate New
-              </a>
+              {mascotLimitReached ? (
+                <span
+                  className="inline-flex items-center gap-2 bg-surface2 text-muted border border-border text-xs font-bold tracking-wider uppercase px-4 py-2 rounded-md cursor-not-allowed"
+                  title="Mascot limit reached. Delete your existing mascot first."
+                >
+                  Limit Reached
+                </span>
+              ) : (
+                <a
+                  href="/dashboard/creation/new"
+                  className="inline-flex items-center gap-2 bg-accent text-bg text-xs font-bold tracking-wider uppercase px-4 py-2 rounded-md hover:shadow-accent-glow transition-all"
+                >
+                  Generate New
+                </a>
+              )}
             </div>
           )}
         </div>
@@ -163,17 +179,32 @@ export default function CreationPage() {
             Video
           </h2>
           {hasMascot && videos.length > 0 && (
-            <a
-              href="/dashboard/creation/video"
-              className={[
-                'inline-flex items-center gap-2 text-xs font-bold tracking-wider uppercase px-4 py-2 rounded-md transition-all',
-                videos.length >= PLAN_LIMITS.free.videosMax
-                  ? 'bg-surface2 text-muted border border-border cursor-not-allowed pointer-events-none'
-                  : 'bg-accent text-bg hover:shadow-accent-glow',
-              ].join(' ')}
-            >
-              <VideoIcon size={14} /> Create Video
-            </a>
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => setShowUploadVideo(true)}
+                disabled={videoLimitReached}
+                title={videoLimitReached ? 'Video limit reached. Delete one first.' : undefined}
+                className="inline-flex items-center gap-2 text-xs font-medium text-muted border border-border px-4 py-2 rounded-md hover:text-text hover:border-white/15 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <Upload size={14} /> Upload
+              </button>
+              {videoLimitReached ? (
+                <span
+                  className="inline-flex items-center gap-2 bg-surface2 text-muted border border-border text-xs font-bold tracking-wider uppercase px-4 py-2 rounded-md cursor-not-allowed"
+                  title="Video limit reached. Delete your existing video first."
+                >
+                  <VideoIcon size={14} /> Limit Reached
+                </span>
+              ) : (
+                <a
+                  href="/dashboard/creation/video"
+                  className="inline-flex items-center gap-2 bg-accent text-bg text-xs font-bold tracking-wider uppercase px-4 py-2 rounded-md hover:shadow-accent-glow transition-all"
+                >
+                  <VideoIcon size={14} /> Create Video
+                </a>
+              )}
+            </div>
           )}
         </div>
 
@@ -182,6 +213,8 @@ export default function CreationPage() {
             videos={videos}
             loading={!videosFetched}
             onSelect={(v) => setSelectedVideo(v)}
+            onUpload={() => setShowUploadVideo(true)}
+            canUpload={!videoLimitReached}
           />
         ) : (
           <div className="bg-surface border border-dashed border-border rounded-xl p-10 text-center opacity-40 cursor-not-allowed select-none">
@@ -218,6 +251,19 @@ export default function CreationPage() {
           onSuccess={() => {
             setShowUpload(false)
             fetchMascots(user.uid)
+          }}
+        />
+      )}
+
+      {/* Upload Video Modal */}
+      {showUploadVideo && user && (
+        <UploadVideoModal
+          uid={user.uid}
+          mascots={mascots}
+          onClose={() => setShowUploadVideo(false)}
+          onSuccess={() => {
+            setShowUploadVideo(false)
+            fetchVideos(user.uid)
           }}
         />
       )}
@@ -415,10 +461,14 @@ function VideoSection({
   videos,
   loading,
   onSelect,
+  onUpload,
+  canUpload,
 }: {
   videos: SavedVideoCard[]
   loading: boolean
   onSelect: (video: SavedVideoCard) => void
+  onUpload: () => void
+  canUpload: boolean
 }) {
   if (loading) {
     return (
@@ -434,15 +484,25 @@ function VideoSection({
         <div className="text-5xl mb-5">🎬</div>
         <h3 className="text-lg font-semibold text-text mb-2">No videos yet</h3>
         <p className="text-sm text-muted max-w-xs mx-auto mb-8 leading-relaxed">
-          Turn your mascot into a 30-second story video. Pick a template, hit
-          generate, and watch it come to life.
+          Turn your mascot into a 30-second story video — or upload an existing
+          clip you already have.
         </p>
-        <a
-          href="/dashboard/creation/video"
-          className="inline-flex items-center gap-2 bg-accent text-bg text-sm font-bold tracking-wider uppercase px-8 py-3.5 rounded-md hover:shadow-accent-glow hover:-translate-y-0.5 transition-all duration-200"
-        >
-          <VideoIcon size={16} /> Create Your First Video
-        </a>
+        <div className="flex items-center justify-center gap-3 flex-wrap">
+          <a
+            href="/dashboard/creation/video"
+            className="inline-flex items-center gap-2 bg-accent text-bg text-sm font-bold tracking-wider uppercase px-8 py-3.5 rounded-md hover:shadow-accent-glow hover:-translate-y-0.5 transition-all duration-200"
+          >
+            <VideoIcon size={16} /> Create Your First Video
+          </a>
+          <button
+            type="button"
+            onClick={onUpload}
+            disabled={!canUpload}
+            className="inline-flex items-center gap-2 text-sm font-bold tracking-wider uppercase text-text border border-border px-8 py-3.5 rounded-md hover:border-accent/40 hover:-translate-y-0.5 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0"
+          >
+            <Upload size={16} /> Upload Video
+          </button>
+        </div>
       </div>
     )
   }
@@ -744,6 +804,350 @@ function UploadMascotModal({
                 </>
               ) : (
                 'Save Mascot'
+              )}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function UploadVideoModal({
+  uid,
+  mascots,
+  onClose,
+  onSuccess,
+}: {
+  uid: string
+  mascots: SavedMascotCard[]
+  onClose: () => void
+  onSuccess: () => void
+}) {
+  const fileInputRef = useRef<HTMLInputElement>(null)
+  const videoElRef = useRef<HTMLVideoElement | null>(null)
+  const [file, setFile] = useState<File | null>(null)
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null)
+  const [duration, setDuration] = useState<number | null>(null)
+  const [name, setName] = useState('')
+  const [mascotKey, setMascotKey] = useState<string | null>(
+    mascots[0] ? `${mascots[0].brandId}-${mascots[0].mascotId}` : null,
+  )
+  const [dragActive, setDragActive] = useState(false)
+  const [uploading, setUploading] = useState(false)
+  const [progress, setProgress] = useState(0)
+  const [error, setError] = useState<string | null>(null)
+
+  const ACCEPTED = '.mp4,.mov,.webm,.m4v'
+  const MAX_MB = 100
+
+  /**
+   * Grab a single frame from the in-memory video element, return it as a JPEG
+   * Blob (or null if the browser blocks capture, e.g. cross-origin video).
+   */
+  const captureThumbnail = (): Promise<Blob | null> =>
+    new Promise((resolve) => {
+      const v = videoElRef.current
+      if (!v || !v.videoWidth || !v.videoHeight) return resolve(null)
+
+      try {
+        const canvas = document.createElement('canvas')
+        canvas.width = v.videoWidth
+        canvas.height = v.videoHeight
+        const ctx = canvas.getContext('2d')
+        if (!ctx) return resolve(null)
+        ctx.drawImage(v, 0, 0, canvas.width, canvas.height)
+        canvas.toBlob((blob) => resolve(blob), 'image/jpeg', 0.85)
+      } catch (err) {
+        console.warn('Thumbnail capture failed:', err)
+        resolve(null)
+      }
+    })
+
+  /**
+   * Seek the preview video to a frame we want to use as the cover, then
+   * trigger the capture once that frame has rendered.
+   */
+  const seekToThumbnailFrame = () => {
+    const v = videoElRef.current
+    if (!v) return
+    const target = Math.min(1, Math.max(0, (v.duration || 1) * 0.1))
+    if (Number.isFinite(target)) {
+      try {
+        v.currentTime = target
+      } catch {
+        // some browsers throw if metadata isn't ready yet; ignore
+      }
+    }
+  }
+
+  const selectedMascot = mascots.find(
+    (m) => `${m.brandId}-${m.mascotId}` === mascotKey,
+  )
+
+  const cleanupPreview = (url: string | null) => {
+    if (url) URL.revokeObjectURL(url)
+  }
+
+  const handleFile = (f: File) => {
+    if (!f.type.startsWith('video/') && !/\.(mp4|mov|webm|m4v)$/i.test(f.name)) {
+      setError('Please choose a video file (MP4, MOV, WebM, M4V).')
+      return
+    }
+    if (f.size > MAX_MB * 1024 * 1024) {
+      setError(`File too large. Maximum ${MAX_MB} MB.`)
+      return
+    }
+    setError(null)
+    setFile(f)
+    cleanupPreview(previewUrl)
+    const url = URL.createObjectURL(f)
+    setPreviewUrl(url)
+    setDuration(null)
+  }
+
+  const handleDrop = (e: DragEvent<HTMLLabelElement>) => {
+    e.preventDefault()
+    setDragActive(false)
+    const f = e.dataTransfer.files?.[0]
+    if (f) handleFile(f)
+  }
+
+  const handleSubmit = async () => {
+    if (!file) {
+      setError('Please select a video.')
+      return
+    }
+    if (!selectedMascot) {
+      setError('Please pick a mascot to attach this video to.')
+      return
+    }
+
+    setUploading(true)
+    setError(null)
+    setProgress(0)
+
+    try {
+      const timestamp = Date.now()
+      const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_')
+
+      // Capture a poster frame BEFORE the upload — the in-memory blob URL is
+      // same-origin and won't taint the canvas.
+      const thumbBlob = await captureThumbnail()
+
+      const path = `videos/${uid}/${timestamp}_${safeName}`
+      const ref = storageRef(storage, path)
+      await uploadBytes(ref, file, { contentType: file.type || 'video/mp4' })
+      setProgress(60)
+      const downloadUrl = await getDownloadURL(ref)
+
+      let thumbnailUrl: string | null = null
+      if (thumbBlob) {
+        try {
+          const thumbPath = `videos/${uid}/${timestamp}_thumb.jpg`
+          const thumbRef = storageRef(storage, thumbPath)
+          await uploadBytes(thumbRef, thumbBlob, { contentType: 'image/jpeg' })
+          thumbnailUrl = await getDownloadURL(thumbRef)
+        } catch (thumbErr) {
+          console.warn('Thumbnail upload failed (will fall back):', thumbErr)
+        }
+      }
+      setProgress(100)
+
+      await saveUploadedVideo(uid, {
+        brandId: selectedMascot.brandId,
+        mascotId: selectedMascot.mascotId,
+        mascotName: selectedMascot.name,
+        mascotImageUrl: selectedMascot.chosenImageUrl,
+      }, {
+        videoUrl: downloadUrl,
+        name: name.trim() || undefined,
+        duration: duration ?? undefined,
+        thumbnailUrl,
+      })
+
+      onSuccess()
+    } catch (err) {
+      console.error('Video upload failed:', err)
+      setError(err instanceof Error ? err.message : 'Upload failed. Please try again.')
+    } finally {
+      setUploading(false)
+    }
+  }
+
+  useEffect(() => {
+    return () => {
+      cleanupPreview(previewUrl)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
+
+      <div className="relative bg-surface border border-border rounded-2xl w-full max-w-md shadow-2xl max-h-[90vh] overflow-y-auto">
+        <button
+          type="button"
+          onClick={onClose}
+          className="absolute top-4 right-4 z-10 w-8 h-8 rounded-full bg-surface2 border border-border flex items-center justify-center text-muted hover:text-text transition-colors"
+        >
+          <X size={16} />
+        </button>
+
+        <div className="p-6 sm:p-8 space-y-5">
+          <div>
+            <h2 className="text-lg font-bold text-text">Upload Video</h2>
+            <p className="text-xs text-muted mt-1">
+              Upload an existing video clip. MP4, MOV, or WebM up to {MAX_MB} MB.
+            </p>
+          </div>
+
+          {mascots.length === 0 ? (
+            <div className="bg-yellow-500/10 border border-yellow-500/30 text-yellow-200 rounded-lg px-3 py-2 text-xs">
+              You need at least one mascot before uploading a video.
+            </div>
+          ) : null}
+
+          {/* Drop zone / preview */}
+          {previewUrl ? (
+            <div className="relative rounded-xl overflow-hidden border border-border bg-black aspect-video">
+              <video
+                ref={videoElRef}
+                src={previewUrl}
+                controls
+                playsInline
+                muted
+                preload="metadata"
+                onLoadedMetadata={(e) => {
+                  const d = (e.target as HTMLVideoElement).duration
+                  if (Number.isFinite(d)) setDuration(d)
+                  seekToThumbnailFrame()
+                }}
+                className="absolute inset-0 w-full h-full object-contain"
+              />
+              <button
+                type="button"
+                onClick={() => {
+                  cleanupPreview(previewUrl)
+                  setFile(null)
+                  setPreviewUrl(null)
+                  setDuration(null)
+                }}
+                className="absolute top-2 right-2 z-10 w-7 h-7 rounded-full bg-bg/80 border border-border flex items-center justify-center text-muted hover:text-text transition-colors"
+              >
+                <X size={14} />
+              </button>
+            </div>
+          ) : (
+            <label
+              onDragOver={(e) => { e.preventDefault(); setDragActive(true) }}
+              onDragLeave={() => setDragActive(false)}
+              onDrop={handleDrop}
+              className={[
+                'block aspect-video rounded-xl border-2 border-dashed cursor-pointer transition-colors flex flex-col items-center justify-center gap-3',
+                dragActive
+                  ? 'border-accent bg-accent/5'
+                  : 'border-border bg-surface2 hover:border-accent/50',
+              ].join(' ')}
+            >
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept={ACCEPTED}
+                onChange={(e) => e.target.files?.[0] && handleFile(e.target.files[0])}
+                className="hidden"
+              />
+              <Upload size={28} className="text-muted" />
+              <div className="text-center">
+                <p className="text-sm text-text font-medium">
+                  Drop video here or <span className="text-accent">browse</span>
+                </p>
+                <p className="text-xs text-muted mt-1">MP4 · MOV · WebM</p>
+              </div>
+            </label>
+          )}
+
+          {file && duration !== null && (
+            <p className="text-[11px] text-muted">
+              Detected duration: {Math.round(duration)}s · {Math.round(file.size / (1024 * 1024) * 10) / 10} MB
+            </p>
+          )}
+
+          {/* Mascot selector (only if 2+) */}
+          {mascots.length > 1 && (
+            <div>
+              <label className="text-xs font-semibold uppercase tracking-wider text-muted mb-2 block">
+                Attach to Mascot
+              </label>
+              <select
+                value={mascotKey ?? ''}
+                onChange={(e) => setMascotKey(e.target.value)}
+                className="w-full bg-surface2 border border-border rounded-lg px-4 py-3 text-sm text-text focus:outline-none focus:border-accent transition-colors"
+              >
+                {mascots.map((m) => (
+                  <option
+                    key={`${m.brandId}-${m.mascotId}`}
+                    value={`${m.brandId}-${m.mascotId}`}
+                  >
+                    {m.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
+
+          {/* Video name */}
+          <div>
+            <label className="text-xs font-semibold uppercase tracking-wider text-muted mb-2 block">
+              Video Name (Optional)
+            </label>
+            <input
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="e.g. Brand Intro, Behind the Scenes…"
+              className="w-full bg-surface2 border border-border rounded-lg px-4 py-3 text-sm text-text placeholder:text-muted focus:outline-none focus:border-accent transition-colors"
+            />
+          </div>
+
+          {error && (
+            <div className="bg-red-500/10 border border-red-500/30 text-red-300 rounded-lg px-3 py-2 text-xs">
+              {error}
+            </div>
+          )}
+
+          {uploading && progress > 0 && progress < 100 && (
+            <div className="h-1 bg-surface2 rounded-full overflow-hidden">
+              <div
+                className="h-full bg-accent transition-all duration-300"
+                style={{ width: `${progress}%` }}
+              />
+            </div>
+          )}
+
+          {/* Actions */}
+          <div className="flex items-center justify-end gap-3 pt-2">
+            <button
+              type="button"
+              onClick={onClose}
+              disabled={uploading}
+              className="text-xs font-medium text-muted border border-border px-5 py-3 rounded-md hover:text-text hover:border-white/15 transition-colors disabled:opacity-50"
+            >
+              Cancel
+            </button>
+            <button
+              type="button"
+              onClick={handleSubmit}
+              disabled={!file || !selectedMascot || uploading}
+              className="inline-flex items-center gap-2 bg-accent text-bg text-sm font-bold tracking-wider uppercase px-6 py-3 rounded-md hover:shadow-accent-glow transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {uploading ? (
+                <>
+                  <Loader2 size={16} className="animate-spin" /> Saving…
+                </>
+              ) : (
+                'Save Video'
               )}
             </button>
           </div>
