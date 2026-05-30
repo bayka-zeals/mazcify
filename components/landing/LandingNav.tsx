@@ -7,7 +7,7 @@ export default function LandingNav() {
   const { user } = useAuth()
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-12 h-[68px] border-b border-border bg-bg/85 backdrop-blur-md">
+    <nav className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-12 h-[68px] border-b border-border bg-black/85 backdrop-blur-md">
       {/* Logo */}
       <Link href="/" className="font-display text-2xl tracking-widest text-text uppercase">
         MAZC<span className="text-accent">I</span>FY
