@@ -19,7 +19,7 @@ import { VIDEO_CONFIG, PLAN_LIMITS, isAdmin } from '@/config/constants'
 import type { VideoProgressEvent } from '@/types'
 
 export const runtime = 'nodejs'
-export const maxDuration = 600 // up to 10 minutes for the SSE stream
+export const maxDuration = 300 // Vercel Hobby plan limit (5 minutes)
 
 const PostBodySchema = z.object({
   userId: z.string().min(1),
