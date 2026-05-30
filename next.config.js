@@ -17,6 +17,11 @@ const nextConfig = {
   experimental: {
     serverComponentsExternalPackages: ['pdf-parse', 'pdfjs-dist'],
   },
+  // Lint runs in CI and locally via `npm run lint` — keep the deploy build
+  // resilient to ESLint plugin resolution issues on Vercel.
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
 }
 
 module.exports = nextConfig
