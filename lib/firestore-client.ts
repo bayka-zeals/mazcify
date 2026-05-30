@@ -240,7 +240,7 @@ export async function createVideoDoc(
   const videoId = crypto.randomUUID()
   const ref = doc(db, 'users', uid, 'brands', data.brandId, 'videos', videoId)
 
-  const initial: Partial<Video> & { createdAt: unknown; updatedAt: unknown } = {
+  const initial: Record<string, unknown> = {
     id: videoId,
     brandId: data.brandId,
     mascotId: data.mascotId,
@@ -248,7 +248,7 @@ export async function createVideoDoc(
     mascotImageUrl: data.mascotImageUrl,
     templateId: data.templateId,
     templateName: data.templateName,
-    status: 'pending',
+    status: 'pending' satisfies VideoStatus,
     currentClip: 0,
     totalClips: data.totalClips,
     clipVideoIds: [],
