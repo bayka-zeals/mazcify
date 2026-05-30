@@ -1,0 +1,288 @@
+'use client'
+
+import { useState, useRef, useEffect } from 'react'
+import Link from 'next/link'
+import { useRouter } from 'next/navigation'
+import { ArrowLeft } from 'lucide-react'
+import Step1Form from '@/components/creation/Step1Form'
+import PromptEditor from '@/components/creation/PromptEditor'
+import MascotVariations from '@/components/creation/MascotVariations'
+import CharacterSheetView from '@/components/creation/CharacterSheetView'
+import { useAuth } from '@/lib/auth-context'
+import {
+  saveBrand,
+  saveMascot,
+  savePromptVersion,
+  updateMascotChosen,
+} from '@/lib/firestore-client'
+import type { BrandMeta, MascotVariation } from '@/types'
+
+type Phase = 'form' | 'prompt' | 'variations' | 'sheet'
+
+interface ScrapeResult {
+  brandbook: string
+  meta: BrandMeta
+  imagePrompt: string
+  brandId: string
+  mascotId: string
+  mascotName: string
+  gender: 'male' | 'female' | 'neutral'
+  description: string
+}
+
+export default function CreationNewPage() {
+  const { user } = useAuth()
+  const router = useRouter()
+  const [phase, setPhase] = useState<Phase>('form')
+  const [scrape, setScrape] = useState<ScrapeResult | null>(null)
+  const [editedPrompt, setEditedPrompt] = useState<string>('')
+  const [variations, setVariations] = useState<MascotVariation[]>([])
+  const [formGender, setFormGender] = useState<'male' | 'female' | 'neutral'>('neutral')
+  const [formName, setFormName] = useState<string>('')
+  const [formDescription, setFormDescription] = useState<string>('')
+
+  const [chosenVariation, setChosenVariation] = useState<MascotVariation | null>(null)
+  const [characterSheetUrl, setCharacterSheetUrl] = useState<string | null>(null)
+  const [sheetLoading, setSheetLoading] = useState(false)
+  const [sheetError, setSheetError] = useState<string | null>(null)
+  const [saving, setSaving] = useState(false)
+
+  const phaseContentRef = useRef<HTMLDivElement>(null)
+  const sheetAbortRef = useRef<AbortController | null>(null)
+
+  useEffect(() => {
+    if (phase !== 'form' && phaseContentRef.current) {
+      phaseContentRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    }
+  }, [phase])
+
+  useEffect(() => {
+    return () => {
+      sheetAbortRef.current?.abort()
+    }
+  }, [])
+
+  const handleScrapeSuccess = async (data: ScrapeResult) => {
+    setScrape(data)
+    setEditedPrompt(data.imagePrompt)
+    setFormName(data.mascotName)
+    setFormGender(data.gender)
+    setFormDescription(data.description)
+    setPhase('prompt')
+
+    if (user) {
+      try {
+        await saveBrand(user.uid, data.brandId, {
+          ...data.meta,
+          brandbook: data.brandbook,
+        })
+        await saveMascot(user.uid, data.brandId, data.mascotId, {
+          name: data.mascotName,
+          gender: data.gender,
+          description: data.description,
+          imagePrompt: data.imagePrompt,
+          status: 'generating',
+        })
+      } catch (err) {
+        console.error('Firestore save failed:', err)
+      }
+    }
+  }
+
+  const handleVariationsSuccess = async (vars: MascotVariation[], prompt: string) => {
+    setVariations(vars)
+    setEditedPrompt(prompt)
+    setPhase('variations')
+
+    if (user && scrape) {
+      try {
+        await savePromptVersion(user.uid, scrape.brandId, prompt)
+        await saveMascot(user.uid, scrape.brandId, scrape.mascotId, {
+          imagePrompt: prompt,
+          status: 'selecting',
+        })
+      } catch (err) {
+        console.error('Firestore save failed:', err)
+      }
+    }
+  }
+
+  const handleGenerateSheet = async (variation: MascotVariation) => {
+    if (!user || !scrape) return
+
+    sheetAbortRef.current?.abort()
+    const controller = new AbortController()
+    sheetAbortRef.current = controller
+    const timeoutId = setTimeout(() => controller.abort(), 10 * 60 * 1000)
+
+    setChosenVariation(variation)
+    setCharacterSheetUrl(null)
+    setSheetError(null)
+    setSheetLoading(true)
+    setPhase('sheet')
+
+    try {
+      const res = await fetch('/api/mascot', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        signal: controller.signal,
+        body: JSON.stringify({
+          userId: user.uid,
+          brandId: scrape.brandId,
+          mascotId: scrape.mascotId,
+          chosenVariationId: variation.id,
+          chosenImageUrl: variation.imageUrl,
+          gender: formGender,
+          mascotName: formName || undefined,
+          description: formDescription || undefined,
+        }),
+      })
+
+      if (!res.ok) {
+        const errBody = await res.json().catch(() => ({}))
+        throw new Error(errBody.error || `Request failed with ${res.status}`)
+      }
+
+      const data = await res.json()
+      setCharacterSheetUrl(data.characterSheetUrl)
+    } catch (err) {
+      if (controller.signal.aborted) {
+        setSheetError('Request timed out. Please try again.')
+      } else {
+        console.error(err)
+        setSheetError(err instanceof Error ? err.message : 'Failed to generate character sheet.')
+      }
+    } finally {
+      clearTimeout(timeoutId)
+      setSheetLoading(false)
+    }
+  }
+
+  const handleSaveCharacter = async () => {
+    if (!user || !scrape || !chosenVariation || !characterSheetUrl) return
+
+    setSaving(true)
+    try {
+      const savePromise = updateMascotChosen(
+        user.uid,
+        scrape.brandId,
+        scrape.mascotId,
+        chosenVariation.imageUrl,
+        characterSheetUrl,
+        formName || undefined,
+      )
+      const timeout = new Promise<never>((_, reject) =>
+        setTimeout(() => reject(new Error('Save timed out after 30s. Please try again.')), 30_000),
+      )
+      await Promise.race([savePromise, timeout])
+      router.push('/dashboard/creation')
+    } catch (err) {
+      console.error('Save failed:', err)
+      setSheetError(err instanceof Error ? err.message : 'Failed to save.')
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  return (
+    <div className="max-w-5xl mx-auto space-y-8">
+      <div>
+        <Link
+          href="/dashboard/creation"
+          className="inline-flex items-center gap-2 text-xs text-muted hover:text-text transition-colors mb-4"
+        >
+          <ArrowLeft size={14} /> Back to Creation
+        </Link>
+        <p className="text-accent text-xs font-semibold tracking-[3px] uppercase mb-1">
+          Step 1 — Image Generation
+        </p>
+        <h1 className="font-display text-3xl uppercase tracking-wide text-text">
+          Mazcot Generation
+        </h1>
+      </div>
+
+      <PhaseIndicator phase={phase} />
+
+      <div ref={phaseContentRef} />
+      {phase === 'form' && <Step1Form onSuccess={handleScrapeSuccess} />}
+
+      {phase === 'prompt' && scrape && (
+        <PromptEditor
+          imagePrompt={editedPrompt}
+          brandbook={scrape.brandbook}
+          meta={scrape.meta}
+          brandId={scrape.brandId}
+          mascotId={scrape.mascotId}
+          onPromptChange={setEditedPrompt}
+          onSuccess={handleVariationsSuccess}
+          onBack={() => setPhase('form')}
+        />
+      )}
+
+      {phase === 'variations' && scrape && (
+        <MascotVariations
+          variations={variations}
+          onConfirm={handleGenerateSheet}
+          onRegenerate={() => setPhase('prompt')}
+          onBack={() => setPhase('form')}
+          loading={sheetLoading}
+        />
+      )}
+
+      {phase === 'sheet' && chosenVariation && (
+        <CharacterSheetView
+          characterSheetUrl={characterSheetUrl}
+          mascotImageUrl={chosenVariation.imageUrl}
+          loading={sheetLoading}
+          saving={saving}
+          error={sheetError}
+          onSave={handleSaveCharacter}
+        />
+      )}
+    </div>
+  )
+}
+
+function PhaseIndicator({ phase }: { phase: Phase }) {
+  const steps: { id: Phase; label: string }[] = [
+    { id: 'form', label: '01 · Brand' },
+    { id: 'prompt', label: '02 · Prompt' },
+    { id: 'variations', label: '03 · Mascot' },
+    { id: 'sheet', label: '04 · Sheet' },
+  ]
+
+  const activeIndex = steps.findIndex((s) => s.id === phase)
+
+  return (
+    <div className="flex items-center gap-3">
+      {steps.map((step, idx) => {
+        const isActive = idx === activeIndex
+        const isDone = idx < activeIndex
+        return (
+          <div key={step.id} className="flex items-center gap-3">
+            <div
+              className={[
+                'px-3 py-1.5 rounded-full text-xs font-semibold tracking-wider uppercase border transition-colors',
+                isActive
+                  ? 'bg-accent text-bg border-accent'
+                  : isDone
+                  ? 'bg-accent/10 text-accent border-accent/30'
+                  : 'bg-surface text-muted border-border',
+              ].join(' ')}
+            >
+              {step.label}
+            </div>
+            {idx < steps.length - 1 && (
+              <div
+                className={[
+                  'h-px w-8 transition-colors',
+                  idx < activeIndex ? 'bg-accent/40' : 'bg-border',
+                ].join(' ')}
+              />
+            )}
+          </div>
+        )
+      })}
+    </div>
+  )
+}
