@@ -1,0 +1,39 @@
+{
+  "id": "b2c3d4e5-f6a7-8b90-c1d2-e3f4a5b6c7d8-product-showcase",
+  "name": "Product Showcase",
+  "description": "Your mascot becomes the host of its own keynote — presenting, demonstrating, and celebrating a hero product.",
+  "thumbnail": "/templates/product-showcase.svg",
+  "model": "pixverse-c1",
+  "clips": [
+    {
+      "index": 1,
+      "prompt": "{mascot_description} walks confidently into a bright minimalist studio with a glowing pedestal in the foreground. Soft cinematic lighting, slow tracking shot, premium tech vibe.",
+      "duration": 5
+    },
+    {
+      "index": 2,
+      "prompt": "The mascot gestures toward the pedestal as a soft light beam appears above it. The character looks proud, smiles, and tilts head invitingly toward the camera.",
+      "duration": 5
+    },
+    {
+      "index": 3,
+      "prompt": "Close-up of the mascot's expressive face reacting with delight as glowing UI elements and brand-color sparkles float around. Subtle parallax, premium product reveal feel.",
+      "duration": 5
+    },
+    {
+      "index": 4,
+      "prompt": "The mascot points up and outwards as light rays expand from the pedestal area, bathing the scene in warm brand-colored glow. Cinematic, aspirational.",
+      "duration": 5
+    },
+    {
+      "index": 5,
+      "prompt": "The mascot does a small celebratory hop and gives a thumbs up to the camera as confetti-like sparkles swirl gently around the frame.",
+      "duration": 5
+    },
+    {
+      "index": 6,
+      "prompt": "The mascot strikes a confident final pose next to the glowing pedestal, looks toward the camera with a friendly smile. Slow camera pull-back, soft light bloom, polished outro.",
+      "duration": 5
+    }
+  ]
+}

@@ -1,0 +1,39 @@
+{
+  "id": "a1b2c3d4-e5f6-7a89-b0c1-d2e3f4a5b6c7-brand-intro",
+  "name": "Brand Introduction",
+  "description": "A confident 30-second hello — your mascot steps into the spotlight, owns the frame, and waves the world in.",
+  "thumbnail": "/templates/brand-intro.svg",
+  "model": "pixverse-c1",
+  "clips": [
+    {
+      "index": 1,
+      "prompt": "{mascot_description} steps into a clean studio set bathed in soft warm light, looks up at the camera, and gives a friendly wave. Smooth cinematic motion, gentle dolly-in, shallow depth of field, subtle ambient light.",
+      "duration": 5
+    },
+    {
+      "index": 2,
+      "prompt": "Same mascot turns slightly, smiles confidently at the camera, and crosses arms in a relaxed hero pose. The background gently brightens. Smooth subtle motion, no cuts.",
+      "duration": 5
+    },
+    {
+      "index": 3,
+      "prompt": "Camera slowly orbits around the mascot as soft brand-colored light bands swirl behind, framing the character. Calm, premium, polished motion.",
+      "duration": 5
+    },
+    {
+      "index": 4,
+      "prompt": "The mascot does a playful little spin or quick dance step, then lands back into a confident pose. Energetic but graceful, smooth motion blur.",
+      "duration": 5
+    },
+    {
+      "index": 5,
+      "prompt": "The mascot points toward the camera with an inviting expression, as soft light flares hint at brand colors behind. Cinematic, welcoming.",
+      "duration": 5
+    },
+    {
+      "index": 6,
+      "prompt": "The mascot gives one final friendly wave, smiles, and the camera slowly pulls back as soft warm light envelops the frame. Polished outro, gentle fade-out feel.",
+      "duration": 5
+    }
+  ]
+}

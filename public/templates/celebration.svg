@@ -1,0 +1,17 @@
+<svg width="640" height="360" viewBox="0 0 640 360" xmlns="http://www.w3.org/2000/svg">
+  <rect width="640" height="360" fill="#0A0A0A"/>
+  <g opacity="0.9">
+    <rect x="120" y="80" width="8" height="20" fill="#FF8C00" transform="rotate(20 124 90)"/>
+    <rect x="180" y="50" width="6" height="16" fill="#FF8C00" transform="rotate(-15 183 58)"/>
+    <rect x="240" y="100" width="8" height="22" fill="#FF8C00" transform="rotate(40 244 111)"/>
+    <rect x="320" y="40" width="6" height="18" fill="#FF8C00" transform="rotate(10 323 49)"/>
+    <rect x="380" y="80" width="8" height="20" fill="#FF8C00" transform="rotate(-30 384 90)"/>
+    <rect x="440" y="60" width="6" height="16" fill="#FF8C00" transform="rotate(25 443 68)"/>
+    <rect x="500" y="100" width="8" height="22" fill="#FF8C00" transform="rotate(-20 504 111)"/>
+    <rect x="160" y="160" width="6" height="14" fill="#F5F5F5" transform="rotate(15 163 167)"/>
+    <rect x="280" y="180" width="6" height="14" fill="#F5F5F5" transform="rotate(-25 283 187)"/>
+    <rect x="420" y="170" width="6" height="14" fill="#F5F5F5" transform="rotate(35 423 177)"/>
+  </g>
+  <text x="320" y="240" font-family="Anton, sans-serif" font-size="80" fill="#FF8C00" text-anchor="middle" font-weight="bold">YES!</text>
+  <text x="320" y="320" font-family="Anton, sans-serif" font-size="22" fill="#F5F5F5" text-anchor="middle" letter-spacing="3">CELEBRATION</text>
+</svg>

@@ -1,0 +1,39 @@
+{
+  "id": "e5f6a7b8-c9d0-1e23-f4a5-b6c7d8e9f0a1-celebration",
+  "name": "Celebration",
+  "description": "A milestone moment — your mascot celebrates a launch, a win, or a thank-you with confetti, cheers, and big energy.",
+  "thumbnail": "/templates/celebration.svg",
+  "model": "pixverse-c1",
+  "clips": [
+    {
+      "index": 1,
+      "prompt": "{mascot_description} stands center frame in a stylish space as confetti slowly begins to fall from above. The character looks up with delight and beams a huge smile. Cinematic, joyful lighting.",
+      "duration": 5
+    },
+    {
+      "index": 2,
+      "prompt": "The mascot throws both arms up in the air in a triumphant celebratory pose as confetti rains down faster. Slow-motion feel, expressive, joyful.",
+      "duration": 5
+    },
+    {
+      "index": 3,
+      "prompt": "The mascot does a happy little jump, lands with arms wide, and laughs at the camera. Bright background light pulses gently. Warm, festive energy.",
+      "duration": 5
+    },
+    {
+      "index": 4,
+      "prompt": "Close-up of the mascot's expressive face — eyes shining, big smile, surrounded by floating sparkles and soft brand-colored bokeh. Cinematic milestone moment.",
+      "duration": 5
+    },
+    {
+      "index": 5,
+      "prompt": "The mascot opens an oversized invisible champagne or party-popper as bright sparkles burst forward. Playful, joyful, slightly slow motion.",
+      "duration": 5
+    },
+    {
+      "index": 6,
+      "prompt": "The mascot gives a heartfelt thank-you gesture — hand on chest, a small bow or wave — as confetti gently settles. Warm, grateful, cinematic outro.",
+      "duration": 5
+    }
+  ]
+}

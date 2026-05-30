@@ -1,0 +1,39 @@
+{
+  "id": "c3d4e5f6-a7b8-9c01-d2e3-f4a5b6c7d8e9-social-greeting",
+  "name": "Social Media Greeting",
+  "description": "An energetic, scroll-stopping greeting tuned for short-form social — punchy, expressive, made to wave and welcome.",
+  "thumbnail": "/templates/social-greeting.svg",
+  "model": "pixverse-c1",
+  "clips": [
+    {
+      "index": 1,
+      "prompt": "{mascot_description} pops into frame with an excited expression and waves enthusiastically at the camera. Bright vibrant background, energetic upbeat motion, social-media ready.",
+      "duration": 5
+    },
+    {
+      "index": 2,
+      "prompt": "The mascot does a playful little dance — a quick shimmy or sway side to side — with a huge smile. Lively, expressive body language, fun and engaging.",
+      "duration": 5
+    },
+    {
+      "index": 3,
+      "prompt": "The mascot makes a fun reaction face — eyes wide with delight, then strikes a goofy thumbs-up pose. Quick, charming, snappy energy.",
+      "duration": 5
+    },
+    {
+      "index": 4,
+      "prompt": "The mascot points directly at the camera as if calling out the viewer, then makes a heart-shape with hands or a high-five gesture. Warm, inviting, bursting with personality.",
+      "duration": 5
+    },
+    {
+      "index": 5,
+      "prompt": "The mascot blows a playful kiss or gives a celebratory cheer with arms in the air. Confetti-like sparkles bloom around. Joyful, vibrant motion.",
+      "duration": 5
+    },
+    {
+      "index": 6,
+      "prompt": "The mascot ends with a big wink and a final wave, then strikes a fun signature pose. Punchy upbeat outro, ready to loop.",
+      "duration": 5
+    }
+  ]
+}

@@ -1,0 +1,39 @@
+{
+  "id": "d4e5f6a7-b8c9-0d12-e3f4-a5b6c7d8e9f0-behind-scenes",
+  "name": "Behind the Scenes",
+  "description": "A relatable workday vignette — your mascot working, thinking, building, and celebrating tiny wins in a stylish workspace.",
+  "thumbnail": "/templates/behind-scenes.svg",
+  "model": "pixverse-c1",
+  "clips": [
+    {
+      "index": 1,
+      "prompt": "{mascot_description} sits at a stylish modern desk with a laptop and warm desk lamp glow. Looks up from work, smiles, and waves at the camera. Cozy office aesthetic, soft cinematic lighting.",
+      "duration": 5
+    },
+    {
+      "index": 2,
+      "prompt": "The mascot leans over the keyboard, typing quickly and confidently. Quick subtle camera push-in, focused expression, productive vibe.",
+      "duration": 5
+    },
+    {
+      "index": 3,
+      "prompt": "The mascot leans back, places a hand on chin in a thoughtful pose, then a small lightbulb-shaped glow appears overhead. A clear 'aha!' moment.",
+      "duration": 5
+    },
+    {
+      "index": 4,
+      "prompt": "The mascot stands up, gestures excitedly at a whiteboard or floating UI mockup beside the desk. Animated, passionate, creative-director energy.",
+      "duration": 5
+    },
+    {
+      "index": 5,
+      "prompt": "The mascot fist-pumps in celebration, sits back down, and gives a satisfied smile to the camera. Warm and human moment, playful.",
+      "duration": 5
+    },
+    {
+      "index": 6,
+      "prompt": "The mascot raises a coffee mug toward the camera in a friendly toast, smiles, and the camera slowly pulls back to reveal the cozy workspace. Polished, inviting outro.",
+      "duration": 5
+    }
+  ]
+}
