@@ -2,8 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { fetchAndParse, extractPdfText } from '@/lib/scraper'
 import { analyzeBrand, generateImagePrompt } from '@/lib/openai'
-
-const MAX_MASCOTS = 3
+import { PLAN_LIMITS, isAdmin } from '@/config/constants'
 
 const ScrapeBodySchema = z.object({
   userId: z.string().min(1),
@@ -27,13 +26,18 @@ export async function POST(req: NextRequest) {
       )
     }
 
-    const { url, mascotName, description, gender, assetStorageUrls, currentMascotCount } =
+    const { userId, url, mascotName, description, gender, assetStorageUrls, currentMascotCount } =
       parsed.data
 
-    if (currentMascotCount >= MAX_MASCOTS) {
+    const mascotLimit = PLAN_LIMITS.free.mascotsMax
+    if (!isAdmin(userId) && currentMascotCount >= mascotLimit) {
       return NextResponse.json(
-        { error: 'Mascot limit reached. Maximum 3 mascots per brand.' },
-        { status: 429 },
+        {
+          error: 'Mascot limit reached',
+          code: 'limit_reached',
+          message: `You've reached your free plan limit of ${mascotLimit} mascot${mascotLimit === 1 ? '' : 's'}. Delete an existing mascot first.`,
+        },
+        { status: 402 },
       )
     }
 

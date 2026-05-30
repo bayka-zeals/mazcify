@@ -10,11 +10,13 @@ import MascotVariations from '@/components/creation/MascotVariations'
 import CharacterSheetView from '@/components/creation/CharacterSheetView'
 import { useAuth } from '@/lib/auth-context'
 import {
+  getMascots,
   saveBrand,
   saveMascot,
   savePromptVersion,
   updateMascotChosen,
 } from '@/lib/firestore-client'
+import { PLAN_LIMITS, isAdmin } from '@/config/constants'
 import type { BrandMeta, MascotVariation } from '@/types'
 
 type Phase = 'form' | 'prompt' | 'variations' | 'sheet'
@@ -47,8 +49,36 @@ export default function CreationNewPage() {
   const [sheetError, setSheetError] = useState<string | null>(null)
   const [saving, setSaving] = useState(false)
 
+  const [mascotCount, setMascotCount] = useState<number>(0)
+  const [mascotCountLoaded, setMascotCountLoaded] = useState(false)
+
   const phaseContentRef = useRef<HTMLDivElement>(null)
   const sheetAbortRef = useRef<AbortController | null>(null)
+
+  const admin = isAdmin(user?.uid)
+  const mascotLimit = PLAN_LIMITS.free.mascotsMax
+  const limitReached = !admin && mascotCount >= mascotLimit
+
+  useEffect(() => {
+    if (!user) {
+      setMascotCountLoaded(true)
+      return
+    }
+    let cancelled = false
+    getMascots(user.uid)
+      .then((m) => {
+        if (!cancelled) setMascotCount(m.length)
+      })
+      .catch((err) => {
+        console.warn('Failed to load mascot count:', err)
+      })
+      .finally(() => {
+        if (!cancelled) setMascotCountLoaded(true)
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [user])
 
   useEffect(() => {
     if (phase !== 'form' && phaseContentRef.current) {
@@ -204,7 +234,31 @@ export default function CreationNewPage() {
       <PhaseIndicator phase={phase} />
 
       <div ref={phaseContentRef} />
-      {phase === 'form' && <Step1Form onSuccess={handleScrapeSuccess} />}
+      {phase === 'form' && (
+        limitReached ? (
+          <div className="bg-yellow-500/10 border border-yellow-500/30 text-yellow-200 rounded-xl px-5 py-6 space-y-3">
+            <p className="text-sm font-semibold">
+              You&apos;ve reached your free plan limit of {mascotLimit} mascot
+              {mascotLimit === 1 ? '' : 's'}.
+            </p>
+            <p className="text-xs text-yellow-200/80">
+              Delete your existing mascot from the gallery to make room for a new one.
+            </p>
+            <Link
+              href="/dashboard/creation"
+              className="inline-flex items-center gap-2 bg-accent text-bg text-xs font-bold tracking-wider uppercase px-5 py-2.5 rounded-md hover:shadow-accent-glow transition-all"
+            >
+              Back to Gallery
+            </Link>
+          </div>
+        ) : mascotCountLoaded ? (
+          <Step1Form currentMascotCount={mascotCount} onSuccess={handleScrapeSuccess} />
+        ) : (
+          <div className="bg-surface border border-border rounded-xl p-10 text-center">
+            <p className="text-sm text-muted animate-pulse">Checking your plan…</p>
+          </div>
+        )
+      )}
 
       {phase === 'prompt' && scrape && (
         <PromptEditor

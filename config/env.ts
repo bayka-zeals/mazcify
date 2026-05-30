@@ -20,6 +20,7 @@ const clientEnvSchema = z.object({
   NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID: z.string().min(1),
   NEXT_PUBLIC_FIREBASE_APP_ID: z.string().min(1),
   NEXT_PUBLIC_APP_URL: z.string().url().default('http://localhost:3000'),
+  NEXT_PUBLIC_ADMIN_UID: z.string().optional().default(''),
 })
 
 // Validate client env — safe to run anywhere
@@ -31,6 +32,7 @@ const clientEnvParsed = clientEnvSchema.safeParse({
   NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
   NEXT_PUBLIC_FIREBASE_APP_ID:             process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
   NEXT_PUBLIC_APP_URL:                     process.env.NEXT_PUBLIC_APP_URL,
+  NEXT_PUBLIC_ADMIN_UID:                   process.env.NEXT_PUBLIC_ADMIN_UID,
 })
 
 if (!clientEnvParsed.success) {

@@ -15,7 +15,7 @@ import {
   extractThumbnail,
 } from '@/lib/ffmpeg'
 import { getVideoTemplateById, resolveTemplatePrompts } from '@/video_templates'
-import { VIDEO_CONFIG } from '@/config/constants'
+import { VIDEO_CONFIG, PLAN_LIMITS, isAdmin } from '@/config/constants'
 import type { VideoProgressEvent } from '@/types'
 
 export const runtime = 'nodejs'
@@ -89,13 +89,17 @@ export async function POST(req: NextRequest) {
   } = parsed.data
 
   // Plan-limit defense in depth — frontend also blocks before posting.
-  const FREE_VIDEO_LIMIT = 5
-  if (typeof currentVideoCount === 'number' && currentVideoCount >= FREE_VIDEO_LIMIT) {
+  const videoLimit = PLAN_LIMITS.free.videosMax
+  if (
+    !isAdmin(userId) &&
+    typeof currentVideoCount === 'number' &&
+    currentVideoCount >= videoLimit
+  ) {
     return NextResponse.json(
       {
         error: 'Free plan limit reached',
         code: 'limit_reached',
-        message: `You've reached your free plan limit of ${FREE_VIDEO_LIMIT} videos. Delete an existing video or upgrade.`,
+        message: `You've reached your free plan limit of ${videoLimit} video${videoLimit === 1 ? '' : 's'}. Delete an existing video or upgrade.`,
       },
       { status: 402 },
     )

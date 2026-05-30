@@ -1,15 +1,53 @@
+'use client'
+
+import { useEffect, useState } from 'react'
 import StatsCard from '@/components/dashboard/StatsCard'
 import WelcomeBanner from '@/components/dashboard/WelcomeBanner'
+import { useAuth } from '@/lib/auth-context'
+import { getMascots, getVideos } from '@/lib/firestore-client'
+import { PLAN_LIMITS, isAdmin } from '@/config/constants'
 
 export default function DashboardHome() {
-  // TODO: fetch real data from Firestore
-  const stats = {
-    mascotsCreated: 0,
-    mascotsLimit: 3,
-    videosGenerated: 0,
-    tokensUsed: 0,
-    tokensLimit: 1000,
-  }
+  const { user, loading: authLoading } = useAuth()
+  const [mascotsCount, setMascotsCount] = useState(0)
+  const [videosCount, setVideosCount] = useState(0)
+  const [loaded, setLoaded] = useState(false)
+
+  useEffect(() => {
+    if (authLoading) return
+    if (!user) {
+      setLoaded(true)
+      return
+    }
+    let cancelled = false
+    Promise.all([getMascots(user.uid), getVideos(user.uid)])
+      .then(([mascots, videos]) => {
+        if (cancelled) return
+        setMascotsCount(mascots.length)
+        setVideosCount(videos.length)
+      })
+      .catch((err) => {
+        console.warn('Failed to load dashboard stats:', err)
+      })
+      .finally(() => {
+        if (!cancelled) setLoaded(true)
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [user, authLoading])
+
+  const admin = isAdmin(user?.uid)
+  const mascotLimit = PLAN_LIMITS.free.mascotsMax
+  const videoLimit = PLAN_LIMITS.free.videosMax
+
+  const mascotValue = admin
+    ? `${mascotsCount} / ∞`
+    : `${mascotsCount} / ${mascotLimit}`
+  const videoValue = admin
+    ? `${videosCount} / ∞`
+    : `${videosCount} / ${videoLimit}`
+  const planSubValue = admin ? 'Admin · Unlimited' : 'Free plan limit'
 
   return (
     <div className="max-w-5xl mx-auto">
@@ -20,22 +58,24 @@ export default function DashboardHome() {
         <StatsCard
           icon="🎭"
           title="Mascots Created"
-          value={`${stats.mascotsCreated} / ${stats.mascotsLimit}`}
-          subValue="Free plan limit"
+          value={loaded ? mascotValue : '…'}
+          subValue={planSubValue}
+          progressValue={admin ? undefined : mascotsCount}
+          progressMax={admin ? undefined : mascotLimit}
         />
         <StatsCard
           icon="🎬"
           title="Videos Generated"
-          value={String(stats.videosGenerated)}
-          subValue="Total all time"
+          value={loaded ? videoValue : '…'}
+          subValue={planSubValue}
+          progressValue={admin ? undefined : videosCount}
+          progressMax={admin ? undefined : videoLimit}
         />
         <StatsCard
           icon="⚡"
-          title="Tokens Used"
-          value={`${stats.tokensUsed} / ${stats.tokensLimit}`}
-          subValue="This month"
-          progressValue={stats.tokensUsed}
-          progressMax={stats.tokensLimit}
+          title="Plan"
+          value={admin ? 'Admin' : 'Free'}
+          subValue={admin ? 'Unlimited generations' : `${mascotLimit} mascot · ${videoLimit} video`}
         />
       </div>
 

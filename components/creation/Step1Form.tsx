@@ -11,6 +11,7 @@ import GenerationProgress, { PROMPT_GENERATION_MESSAGES } from './GenerationProg
 type Gender = 'male' | 'female' | 'neutral'
 
 interface Step1FormProps {
+  currentMascotCount: number
   onSuccess: (data: {
     brandbook: string
     meta: BrandMeta
@@ -27,7 +28,7 @@ const ACCEPTED_EXT = ['.pdf', '.png', '.jpg', '.jpeg']
 const ACCEPT_ATTR = ACCEPTED_EXT.join(',')
 const MAX_FILE_MB = 10
 
-export default function Step1Form({ onSuccess }: Step1FormProps) {
+export default function Step1Form({ currentMascotCount, onSuccess }: Step1FormProps) {
   const { user } = useAuth()
   const fileInputRef = useRef<HTMLInputElement>(null)
 
@@ -112,7 +113,7 @@ export default function Step1Form({ onSuccess }: Step1FormProps) {
           description: description.trim() || undefined,
           gender,
           assetStorageUrls,
-          currentMascotCount: 0,
+          currentMascotCount,
         }),
       })
 

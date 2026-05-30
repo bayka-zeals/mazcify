@@ -13,8 +13,8 @@ export const APP_CONFIG = {
 // ------------------------------------------------------------
 export const PLAN_LIMITS = {
   free: {
-    mascotsMax: 3,
-    videosMax: 5,
+    mascotsMax: 1,
+    videosMax: 1,
     tokensMax: 1000,
   },
   pro: {
@@ -23,6 +23,17 @@ export const PLAN_LIMITS = {
     tokensMax: 10000,
   },
 } as const
+
+// ------------------------------------------------------------
+// Admin bypass
+// ------------------------------------------------------------
+// The admin UID is read from NEXT_PUBLIC_ADMIN_UID so the same helper works
+// on both client and server. Empty string disables the bypass entirely.
+export const ADMIN_UID = process.env.NEXT_PUBLIC_ADMIN_UID ?? ''
+
+export function isAdmin(uid: string | null | undefined): boolean {
+  return !!uid && !!ADMIN_UID && uid === ADMIN_UID
+}
 
 // ------------------------------------------------------------
 // Mascot generation

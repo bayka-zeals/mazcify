@@ -18,7 +18,7 @@ import {
   uploadVideoBackup,
   type SavedMascotCard,
 } from '@/lib/firestore-client'
-import { PLAN_LIMITS } from '@/config/constants'
+import { PLAN_LIMITS, isAdmin } from '@/config/constants'
 import type { VideoFeedback, VideoProgressEvent } from '@/types'
 import type { VideoTemplateSummary } from '@/video_templates/templates-client'
 
@@ -117,13 +117,14 @@ export default function VideoGenerationPage() {
     }
   }, [])
 
-  const limitReached = videoCount >= PLAN_LIMITS.free.videosMax
+  const admin = isAdmin(user?.uid)
+  const limitReached = !admin && videoCount >= PLAN_LIMITS.free.videosMax
 
   const handleGenerate = async () => {
     if (!user || !selectedMascot || !selectedTemplateId) return
     if (limitReached) {
       setError(
-        `You've reached your free plan limit of ${PLAN_LIMITS.free.videosMax} videos. Delete an existing video first.`,
+        `You've reached your free plan limit of ${PLAN_LIMITS.free.videosMax} video${PLAN_LIMITS.free.videosMax === 1 ? '' : 's'}. Delete an existing video first.`,
       )
       return
     }
@@ -434,7 +435,8 @@ export default function VideoGenerationPage() {
       {limitReached && phase !== 'preview' && (
         <div className="bg-yellow-500/10 border border-yellow-500/30 text-yellow-200 rounded-lg px-4 py-3 text-sm">
           You&apos;ve reached the free plan limit of{' '}
-          {PLAN_LIMITS.free.videosMax} videos. Delete an existing video to make
+          {PLAN_LIMITS.free.videosMax} video
+          {PLAN_LIMITS.free.videosMax === 1 ? '' : 's'}. Delete an existing video to make
           room or upgrade.
         </div>
       )}

@@ -38,18 +38,18 @@ describe('POST /api/scrape', () => {
     expect(res.status).toBe(400)
   })
 
-  it('returns 429 when currentMascotCount >= 3', async () => {
+  it('returns 402 when currentMascotCount reaches the free-plan limit', async () => {
     const res = await POST(
       makeRequest({
         userId: 'u1',
         url: 'https://example.com',
         gender: 'male',
-        currentMascotCount: 3,
+        currentMascotCount: 1,
       }),
     )
-    expect(res.status).toBe(429)
+    expect(res.status).toBe(402)
     const body = await res.json()
-    expect(body.error).toContain('limit')
+    expect(body.code).toBe('limit_reached')
   })
 
   it('returns 200 with brandId, mascotId, brandbook, meta, imagePrompt on happy path', async () => {
