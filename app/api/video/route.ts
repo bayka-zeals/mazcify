@@ -1,11 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { join } from 'path'
 import { z } from 'zod'
 import {
   generateVideoFromReference,
   extendVideo,
+  downloadVideo,
   PixVerseError,
   type VideoClipResult,
 } from '@/lib/pixverse'
+import {
+  ensureWorkDir,
+  isFfmpegAvailable,
+  normalizeVideo,
+  extractThumbnail,
+} from '@/lib/ffmpeg'
 import { getVideoTemplateById, resolveTemplatePrompts } from '@/video_templates'
 import { VIDEO_CONFIG } from '@/config/constants'
 import type { VideoProgressEvent } from '@/types'
@@ -248,10 +256,36 @@ export async function POST(req: NextRequest) {
           0,
         )
 
+        // Best-effort FFmpeg post-processing: download via PixVerse CLI,
+        // re-encode to web-friendly H.264/AAC + faststart, generate thumbnail.
+        // If ffmpeg or the download fails, we fall back to the PixVerse CDN URL
+        // directly (which is already a valid MP4).
+        let finalServedUrl = lastResult.videoUrl
+        try {
+          if (await isFfmpegAvailable()) {
+            const workDir = await ensureWorkDir(videoId)
+            const downloadedPath = await downloadVideo(lastResult.videoId, workDir)
+            const normalizedPath = await normalizeVideo(
+              downloadedPath,
+              join(workDir, 'final.mp4'),
+            )
+            if (normalizedPath) {
+              await extractThumbnail(
+                normalizedPath,
+                join(workDir, 'thumb.jpg'),
+                0.5,
+              )
+              finalServedUrl = `/api/video/file?videoId=${encodeURIComponent(videoId)}&kind=video`
+            }
+          }
+        } catch (postErr) {
+          console.warn('[/api/video] post-process failed, using CDN URL:', postErr)
+        }
+
         writeEvent({
           type: 'done',
           videoId,
-          finalVideoUrl: lastResult.videoUrl,
+          finalVideoUrl: finalServedUrl,
           pixverseCdnUrl: lastResult.videoUrl,
           duration: totalDuration,
         })
