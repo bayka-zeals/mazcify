@@ -1,0 +1,29 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Users can read/write their own document
+    match /users/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+
+      // Brands subcollection
+      match /brands/{brandId} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+
+        // Mascots under a brand
+        match /mascots/{mascotId} {
+          allow read, write: if request.auth != null && request.auth.uid == userId;
+        }
+
+        // Videos under a brand
+        match /videos/{videoId} {
+          allow read, write: if request.auth != null && request.auth.uid == userId;
+        }
+      }
+    }
+
+    // Deny everything else
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
